@@ -1,0 +1,614 @@
+<!doctype html><html lang="ro"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Simulator producție v2.1</title>
+<style>
+:root{font:14px system-ui,Arial;color:#eaf1fc;background:#0b1322}*{box-sizing:border-box}body{margin:0}header{padding:16px 22px;background:#132238;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}h1{font-size:20px;margin:0}h2{font-size:15px;margin:0 0 10px}small,p,.hint{color:#a5b6d0}p{font-size:12px;line-height:1.5}.layout{max-width:1650px;margin:auto;padding:14px;display:grid;grid-template-columns:minmax(460px,1.6fr) minmax(340px,1fr);gap:14px}.stack{display:grid;gap:14px;align-content:start}.panel{background:#142238;border:1px solid #2d415e;border-radius:12px;padding:15px;min-width:0}button{border:0;border-radius:7px;background:#2967df;color:white;padding:8px 12px;font-weight:600;cursor:pointer}button.alt{background:#314763}button.red{background:#933c50}button:disabled{opacity:.45;cursor:not-allowed}.actions{display:flex;gap:7px;flex-wrap:wrap}input,select,textarea{width:100%;padding:7px;background:#0b172a;color:#eef5ff;border:1px solid #435877;border-radius:6px;font:inherit}input[type=range]{padding:0}label{display:grid;gap:5px;font-size:12px;color:#c4d3e8}.fields{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px;margin:10px 0}.station{border:1px solid #415775;border-radius:10px;padding:11px;margin:10px 0}.station.selected{border-color:#65b6ff;box-shadow:0 0 0 1px #65b6ff}.station-head{display:flex;justify-content:space-between;align-items:center;gap:7px}.station-head strong{font-size:13px}#stage{display:block;width:100%;height:auto;touch-action:none;user-select:none}#log{height:245px;overflow:auto;font:11px/1.6 ui-monospace,monospace;background:#0a1728;border-radius:7px;padding:8px;overflow-wrap:anywhere}.entry{border-bottom:1px solid #253851;padding:5px 0}.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}.stat{background:#0c192c;padding:12px;border-radius:8px}.stat b{display:block;font-size:23px}.stat small{font-size:11px}textarea{min-height:130px;font:12px/1.4 monospace;resize:vertical}.tag{background:#26405c;padding:4px 9px;border-radius:15px;font-size:11px}.hint{font-size:11px}#message{min-height:20px;color:#8ae3b4;font-size:12px}svg .station-node{cursor:grab}svg .station-node:active{cursor:grabbing}@media(max-width:980px){.layout{grid-template-columns:1fr}}@media(max-width:600px){.layout{padding:7px;grid-template-columns:minmax(0,1fr)}.panel{padding:10px}.fields{grid-template-columns:repeat(2,minmax(0,1fr))}.stats{grid-template-columns:repeat(2,1fr)}}
+</style>
+<style id="appearanceStyles">
+body[data-theme="white"]{background:#f3f6fb;color:#18253b}
+body[data-theme="white"] header{background:#e7edf5}
+body[data-theme="white"] .panel{background:#fff;border-color:#c9d4e3}
+body[data-theme="white"] .stat,body[data-theme="white"] #log{background:#edf3f9}
+body[data-theme="white"] input,body[data-theme="white"] select,body[data-theme="white"] textarea{background:#fff;color:#17253a;border-color:#a6b5c9}
+body[data-theme="white"] p,body[data-theme="white"] small,body[data-theme="white"] .hint,body[data-theme="white"] label{color:#52647d}
+body[data-theme="white"] .station{border-color:#b7c7dc}
+body[data-theme="white"] .station.selected{border-color:#2563eb}
+body[data-theme="white"] .tag{background:#dfe9f7;color:#263c59}
+body[data-theme="white"] .entry{border-color:#d6e0ed}
+body[data-theme="grey"]{background:#333a43;color:#f2f4f6}
+body[data-theme="grey"] header{background:#434c57}
+body[data-theme="grey"] .panel{background:#4b5561;border-color:#77828f}
+body[data-theme="grey"] .stat,body[data-theme="grey"] #log{background:#353e49}
+body[data-theme="grey"] input,body[data-theme="grey"] select,body[data-theme="grey"] textarea{background:#343d48;color:#f5f7fa;border-color:#8592a2}
+body[data-theme="grey"] p,body[data-theme="grey"] small,body[data-theme="grey"] .hint,body[data-theme="grey"] label{color:#d6dee8}
+body[data-theme="grey"] .tag{background:#657384}
+body[data-theme="grey"] .station{border-color:#8995a3}
+.appearance-controls{display:flex;align-items:center;flex-wrap:wrap;gap:6px}
+.appearance-controls button{background:#344a65;border:1px solid #61738b;font-size:12px;padding:7px 10px}
+.appearance-controls button.active{background:#2875df;border-color:#a7cfff;box-shadow:0 0 0 1px #a7cfff}
+body[data-theme="white"] .appearance-controls button{background:#e0e8f3;color:#20344f;border-color:#aebdd0}
+body[data-theme="white"] .appearance-controls button.active{background:#2869d9;color:white}
+body[data-theme="grey"] .appearance-controls button{background:#5c6978;color:white}
+body[data-theme="grey"] .appearance-controls button.active{background:#236bd0}
+</style>
+<style>
+#helpDialog{width:min(900px,calc(100vw - 26px));max-height:88vh;overflow:auto;border:1px solid #617996;border-radius:14px;padding:0;background:#142238;color:#eef4ff;box-shadow:0 22px 75px #0009}
+#helpDialog::backdrop{background:#020917c9}
+#helpDialog .helpTop{display:flex;justify-content:space-between;align-items:center;gap:12px;position:sticky;top:0;background:inherit;border-bottom:1px solid #607087;padding:16px 20px;z-index:2}
+#helpDialog .helpBody{padding:12px 23px 24px;line-height:1.6}
+#helpDialog h2{font-size:21px;margin:0}
+#helpDialog h3{font-size:16px;margin:22px 0 8px;color:#86caff}
+#helpDialog p,#helpDialog li{font-size:13px;color:inherit}
+#helpDialog ol,#helpDialog ul{padding-left:23px}
+#helpDialog code{background:#273e59;padding:2px 5px;border-radius:4px}
+#helpDialog .helpNotice{padding:12px;border-left:3px solid #55b9f9;background:#263c58;border-radius:6px}
+body[data-theme="white"] #helpDialog{background:white;color:#1a2a40;border-color:#b4c4d8}
+body[data-theme="white"] #helpDialog h3{color:#185da8}
+body[data-theme="white"] #helpDialog code,body[data-theme="white"] #helpDialog .helpNotice{background:#eaf2fa}
+body[data-theme="grey"] #helpDialog{background:#485461;color:#fff}
+body[data-theme="grey"] #helpDialog code,body[data-theme="grey"] #helpDialog .helpNotice{background:#333e49}
+</style><style>.imageAssignment{display:flex;gap:12px;align-items:center;flex-wrap:wrap;padding:12px;margin:10px 0;border:1px solid #718198;border-radius:10px}.imageAssignment label{display:flex;flex-direction:column;gap:4px;font-size:12px}.imageAssignment input,.imageAssignment select{width:100%;min-width:0}.imageAssignment button{align-self:center}</style></head><body>
+<header><div><h1>Simulator linie de producție <small>v2.1</small></h1><p>Bandă continuă · stații mutabile · robot handling · proces lângă bandă · evenimente locale</p></div><div class="actions"><button id="toggle">⏸ Pauză</button><button id="reset" class="alt">↺ Reset simulare</button><button id="save" class="alt">Salvează configurația</button><button id="exportCfg" class="alt">Export configurație</button><button id="importCfg" class="alt">Import configurație</button><button id="helpBtn" type="button" class="alt" aria-haspopup="dialog">❔ HELP</button><input id="importFile" type="file" accept=".json,application/json" hidden></div><div class="appearance-controls" aria-label="Display settings">
+<span id="viewLabel" style="font-size:12px">Aspect:</span>
+<button type="button" data-view="black">Black view</button>
+<button type="button" data-view="white">White view</button>
+<button type="button" data-view="grey">Grey view</button>
+<span style="margin-left:7px;font-size:12px" id="languageLabel">Limbă:</span>
+<button type="button" data-lang="ro">RO</button>
+<button type="button" data-lang="en">EN</button>
+</div></header>
+<dialog id="helpDialog" aria-labelledby="helpHeading"><div class="helpTop"><strong id="helpHeading">HELP / Documentation</strong><button type="button" id="helpClose" class="alt">✕ <span id="helpCloseLabel">Închide</span></button></div><div class="helpBody" id="helpRo"><h2>Ghid de utilizare — Simulator linie de producție</h2>
+<p>Aplicația simulează local o bandă ovală continuă, stații de procesare, roboți de manipulare, rute alternative și evacuare. Nu trimite date către un server.</p>
+<h3>1. Primii pași</h3>
+<ol><li>Deschide fișierul HTML în Chrome sau Edge.</li><li>Alege tema Black / White / Grey și limba RO / EN.</li><li>Setează forma benzii, intrarea, ieșirea și sensul de deplasare.</li><li>Adaugă stațiile și configurează timpii, capacitățile și ruta.</li><li>Apasă <b>Continuă</b> pentru rulare sau <b>Pauză</b> pentru oprire temporară.</li><li>Verifică piesele și jurnalul de evenimente JSON.</li></ol>
+<h3>2. Configurarea benzii</h3>
+<ul><li><b>Viteză bandă:</b> factorul de viteză; la 1× o tură de referință durează circa 45 s.</li><li><b>Alimentare (s):</b> intervalul de introducere a pieselor, dacă există loc liber.</li><li><b>Distanță minimă:</b> spațiul dintre piesele aflate pe bandă.</li><li><b>Lungime porțiune dreaptă:</b> alungește sau scurtează ovalul.</li><li><b>Lățime bandă:</b> modifică grosimea desenului.</li><li><b>Orar / Antiorar:</b> schimbă sensul de deplasare.</li><li><b>Intrare / Ieșire:</b> mută marcajele cu mouse-ul sau introdu poziția în procente.</li></ul>
+<h3>3. Adăugarea și poziționarea stațiilor</h3>
+<p>Apasă <b>+ Proces</b> pentru o stație simplă sau <b>+ Robot + proces</b> pentru un robot care preia piesa și o transportă la un proces din afara benzii. Trage marcajul stației pe bandă; alternativ, editează poziția procentuală. Butonul <b>Șterge</b> elimină stația. Modificările structurale pot reseta piesele din simulare.</p>
+<h3>4. Parametrii unei stații</h3>
+<ul><li><b>Nume:</b> denumirea vizibilă.</li><li><b>Capacitate totală:</b> numărul maxim de piese aflate în buffer și în etapele stației.</li><li><b>Durată proces:</b> timpul operației.</li><li><b>Procese paralele:</b> câte piese poate procesa simultan stația.</li><li><b>Ridicare / Repunere:</b> timpii de manipulare ai piesei.</li><li><b>Robot:</b> timp de transport pe sens și capacitatea de operații simultane.</li><li><b>Rată FAIL (%):</b> probabilitatea simulată de NOK la încheierea procesului.</li></ul>
+<h3>5. Procese alternative și ordinea logică</h3>
+<p>Setează același <b>Grup alternativ</b> pentru până la 8 stații (ex. <code>GRUP_A</code>). În <b>Secvență de procesare</b> scrie <code>ST01,GRUP_A,ST05</code>, apoi apasă <b>Aplică ruta</b>. La etapa GRUP_A piesa poate fi preluată de o stație disponibilă din grup. Pozițiile fizice și ordinea logică sunt configurate separat. Aceasta este o rutare prin secvențe/grupuri, nu un editor complet IF/ELSE.</p>
+<h3>6. FAIL și puncte NOK</h3>
+<p>La fiecare stație poți introduce o rată FAIL între 0 și 100%. Folosește <b>+ Poziție NOK</b> pentru a adăuga puncte de respingere; le poți muta pe bandă și redenumi. O piesă care eșuează primește un eveniment <code>process_failed</code> și este direcționată către un punct NOK configurat.</p>
+<h3>7a. Semafor și buffere între procese</h3><p>Configurează pentru fiecare stație capacitatea bufferului de așteptare (0–500 piese). Când stația este plină, piesele se acumulează fizic înaintea ei. Un buffer local plin propagă blocajul spre stația anterioară, dar procesele din aval continuă. Alimentarea continuă cât timp există loc la INTRARE. ROȘU indică saturație locală, nu oprire globală. Valoarea 0 înseamnă fără buffer suplimentar.</p><h3>7. Blocaj în cascadă (capacitate + buffer BEFORE)</h3><p>O stație continuă să proceseze când bufferul ei BEFORE este plin. Când ocuparea stației următoare plus piesele din bufferul BEFORE ating suma capacităților configurate, este blocată <b>ieșirea stației anterioare</b>. Piesa terminată rămâne în stația anterioară până apare loc. Blocajul se propagă în amonte, nu oprește stațiile din aval.</p><h3>8. Bufferul de ieșire</h3>
+<p>Configurează <b>Durată evacuare / piesă</b> și <b>Capacitate evacuare simultană</b>. Bufferul de ieșire păstrează maximum 1.000 de piese în așteptare; când este plin, piesele rămân pe bandă până apare loc. Numai piesele evacuate complet sunt numărate drept finalizate. Piesele cu operații obligatorii incomplete sunt reținute separat, maximum 1.000; atingerea acestei limite blochează alimentarea. Jurnalul exportă ultimele 5.000 de evenimente, iar contorul afișează totalul de la resetare. Browserul poate suspenda filele inactive; pentru rulare continuă păstrează fila activă, dezactivează economisirea memoriei pentru ea și evită repausul calculatorului.</p>
+<h3>8. Imagini pentru linie și produs</h3>
+<p>În <b>Imagini de prezentare</b> introdu un titlu, selectează <b>Peste linie / stație</b> sau <b>Pe produs</b>, alege etapa, dimensiunea și fișierul imagine. Apasă <b>Adaugă imagine</b>. Pentru imaginile de pe produs poți reprezenta vizual diferite stadii de fabricație. Poți reasigna oricând o imagine existentă folosind câmpurile Tip și Asociere de sub imagine. Imaginea piesei se schimbă după etapa selectată. Folosește imagini mici pentru a evita limitele de stocare ale browserului.</p>
+<h3>9. Date JSON și evenimente</h3>
+<p>În <b>Evenimente configurabile</b> selectează stația și momentul (sosire, ridicare, început, finalizare, repunere). Completează un obiect JSON valid și apasă <b>Aplică JSON</b>. Exemplu:</p>
+<pre><code>{
+  "serial": "{{pieceId}}",
+  "station": "{{stationName}}",
+  "result": "OK",
+  "torque_nm": 2.5
+}</code></pre>
+<p>Variabile disponibile: <code>{{pieceId}}</code>, <code>{{stationId}}</code>, <code>{{stationName}}</code>, <code>{{event}}</code>, <code>{{time}}</code>, <code>{{timestamp}}</code>, <code>{{cycle}}</code>. Apasă <b>Previzualizare</b> pentru un exemplu. Evenimentele apar doar în jurnal; <b>Export JSON</b> descarcă evenimentele înregistrate.</p>
+<h3>10. Salvare, import și export</h3>
+<ul><li><b>Salvează configurația:</b> încearcă să o păstreze local în browser.</li><li><b>Export configurație:</b> descarcă un fișier JSON cu parametrii și imaginile.</li><li><b>Import configurație:</b> încarcă un fișier JSON exportat anterior.</li><li><b>Reset simulare:</b> golește piesele și statisticile, păstrând configurarea.</li></ul>
+<div class="helpNotice"><b>Notă:</b> Simulatorul este un instrument demonstrativ offline, nu un controler industrial. Unele reguli de rutare și de capacitate sunt simplificate. Salvează periodic configurația prin export JSON, în special când folosești imagini.</div></div><div class="helpBody" id="helpEn" hidden><h2>User guide — Production Line Simulator</h2>
+<p>This application locally simulates a continuously moving oval conveyor, processing stations, handling robots, alternative routes and unloading. No data is sent to a server.</p>
+<h3>1. Getting started</h3>
+<ol><li>Open the HTML file in Chrome or Edge.</li><li>Choose Black / White / Grey view and RO / EN language.</li><li>Configure conveyor shape, input, output and direction.</li><li>Add stations and configure times, capacities and routing.</li><li>Use <b>Resume</b> to run or <b>Pause</b> to stop temporarily.</li><li>Monitor parts and the JSON event log.</li></ol>
+<h3>2. Conveyor settings</h3>
+<ul><li><b>Conveyor speed:</b> speed multiplier; at 1× a reference lap takes approximately 45 s.</li><li><b>Feed interval (s):</b> time between inserted parts when space is available.</li><li><b>Minimum spacing:</b> gap between parts on the belt.</li><li><b>Straight section length:</b> makes the oval shorter or longer.</li><li><b>Conveyor width:</b> changes the visual thickness.</li><li><b>Clockwise / Counterclockwise:</b> changes travel direction.</li><li><b>Input / Output:</b> drag the markers or set their percentage positions.</li></ul>
+<h3>3. Adding and moving stations</h3>
+<p>Click <b>+ Process</b> for a simple station or <b>+ Robot + process</b> for a robot that picks up a part and transfers it to an off-belt process. Drag a station marker on the conveyor or enter its position percentage. <b>Delete</b> removes a station. Structural edits may reset parts in the current simulation.</p>
+<h3>4. Station parameters</h3>
+<ul><li><b>Name:</b> displayed station name.</li><li><b>Total capacity:</b> maximum number of parts in the station buffer and stages.</li><li><b>Process duration:</b> operation time.</li><li><b>Parallel processing slots:</b> number of parts processed at once.</li><li><b>Pickup / Return:</b> part-handling times.</li><li><b>Robot:</b> travel time per direction and concurrent handling capacity.</li><li><b>FAIL rate (%):</b> simulated probability of a NOK result after processing.</li></ul>
+<h3>5. Parallel alternatives and routing</h3>
+<p>Assign the same <b>Alternative group</b> to up to 8 stations (e.g. <code>GROUP_A</code>). Enter <code>ST01,GROUP_A,ST05</code> in <b>Processing sequence</b>, then click <b>Apply route</b>. At GROUP_A, a part can be handled by an available station in that group. The sequence is calculated automatically from physical station positions and conveyor direction. This is sequence/group routing, not a full IF/ELSE programming editor.</p>
+<h3>6. FAIL and NOK locations</h3>
+<p>Set a FAIL rate from 0 to 100% on each station. Use <b>+ NOK position</b> to add reject locations, then drag or rename them. Failed parts generate <code>process_failed</code> and are routed to a configured NOK position.</p>
+<h3>7a. Conveyor traffic light and interprocess buffers</h3><p>Configure the maximum waiting buffer per station (0–500 parts). When a station is full, parts accumulate physically before it. A full local buffer propagates backpressure upstream, but downstream stations keep running. Feeding continues while INPUT has room. RED indicates local saturation, not a global conveyor stop. A value of 0 means no waiting buffer.</p><h3>7. Cascading blocking (capacity + BEFORE buffer)</h3><p>The overloaded station keeps processing; only its preceding station is interlocked. If the first station is full, the feeder is interlocked. When the next station occupancy plus its BEFORE-buffer count reaches the configured sum, the <b>previous station output</b> is blocked. Its completed part waits at the previous station until capacity becomes available. Blocking propagates upstream while downstream stations continue working.</p><h3>8. Exit buffer</h3>
+<p>Set <b>Unloading duration / part</b> and <b>Concurrent unloading capacity</b>. The exit buffer holds up to 1,000 waiting parts; when full, parts wait on the conveyor until space becomes available. Only fully unloaded parts count as completed. Incomplete parts are held separately, up to 1,000; reaching this limit blocks feeding. The log exports the latest 5,000 events while the counter shows the total since reset. Browsers may suspend inactive tabs; for continuous operation keep this tab active, disable memory saving for it and prevent computer sleep.</p>
+<h3>8. Conveyor and product images</h3>
+<p>Under <b>Presentation images</b>, enter a title, choose <b>Over conveyor / station</b> or <b>On product</b>, select the station/stage, size and image file, then click <b>Add image</b>. Product images can illustrate manufacturing stages. Reassign any existing image using the Type and Assignment fields below its preview. A part image updates after the selected stage. Prefer small files to avoid browser storage limits.</p>
+<h3>9. JSON events</h3>
+<p>Under <b>Configurable events</b>, select a station and trigger (arrival, pickup, process start, completion, return). Enter a valid JSON object and click <b>Apply JSON</b>. Example:</p>
+<pre><code>{
+  "serial": "{{pieceId}}",
+  "station": "{{stationName}}",
+  "result": "OK",
+  "torque_nm": 2.5
+}</code></pre>
+<p>Available placeholders: <code>{{pieceId}}</code>, <code>{{stationId}}</code>, <code>{{stationName}}</code>, <code>{{event}}</code>, <code>{{time}}</code>, <code>{{timestamp}}</code>, <code>{{cycle}}</code>. Click <b>Preview</b> to inspect an example. Events appear only in the local log; <b>Export JSON</b> downloads recorded events.</p>
+<h3>10. Save, import and export</h3>
+<ul><li><b>Save configuration:</b> attempts to save settings in the browser.</li><li><b>Export configuration:</b> downloads a JSON file containing settings and images.</li><li><b>Import configuration:</b> loads a previously exported JSON file.</li><li><b>Reset simulation:</b> clears parts and counters but retains settings.</li></ul>
+<div class="helpNotice"><b>Note:</b> This is an offline demonstration tool, not an industrial controller. Some routing and capacity rules are simplified. Export your configuration regularly, especially when using images.</div></div></dialog><main class="layout"><div class="stack"><section class="panel"><h2>Linia de producție</h2><p>Trage cercurile colorate ale stațiilor, intrării și ieșirii pe bandă. Click pe stație pentru configurare. Robotul (R) deservește un proces separat (P).</p>
+<svg id="stage" viewBox="0 0 960 570" aria-label="Bandă ovală interactivă">
+<path id="track" d="M200 145 H760 A135 135 0 0 1 760 415 H200 A135 135 0 0 1 200 145 Z" fill="none" stroke="#40536d" stroke-width="55"/>
+<path id="trackDashes" d="M200 145 H760 A135 135 0 0 1 760 415 H200 A135 135 0 0 1 200 145 Z" fill="none" stroke="#b4c3d6" stroke-width="2" stroke-dasharray="12 14" opacity=".55"/>
+<g id="trafficSvg"></g><g id="stationsSvg"></g><g id="partsSvg"></g><g id="overlaysSvg"></g><g id="portsSvg"></g>
+<text x="480" y="261" fill="#e5efff" text-anchor="middle" font-size="24" font-weight="700">BANDĂ CONTINUĂ</text><text x="480" y="290" fill="#9ab2d0" text-anchor="middle" font-size="15">↻ sens orar · piese în mișcare</text>
+</svg>
+<div class="actions"><span class="tag">Albastru: bandă</span><span class="tag">Galben: buffer</span><span class="tag">Verde: procesare</span><span class="tag">Roz: repunere</span></div></section>
+<section class="panel"><div class="stats"><div class="stat"><b id="done">0</b><small>Finalizate</small></div><div class="stat"><b id="beltCount">0</b><small>Pe bandă</small></div><div class="stat"><b id="offCount">0</b><small>În stații</small></div><div class="stat"><b id="eventCount">0</b><small>Evenimente</small></div><div class="stat"><b id="nokCount">0</b><small>Piese NOK</small></div><div class="stat"><b id="exitBufferCount">0</b><small>Buffer ieșire</small></div></div></section>
+<section class="panel"><h2>Intrare, ieșire și sens</h2><div class="fields"><label>Poziție intrare (%)<input id="entryPos" type="number" min="0" max="99" step="1"></label><label>Poziție ieșire (%)<input id="exitPos" type="number" min="0" max="99" step="1"></label><label>Sens bandă<select id="direction"><option value="1">Orar ↻</option><option value="-1">Antiorar ↺</option></select></label></div><div class="actions"><button id="clockwise" class="alt">↻ Orar</button><button id="counterclockwise" class="alt">↺ Antiorar</button></div><p>Poți muta INTRARE și IEȘIRE direct pe traseu. Piesele parcurg stațiile în ordinea întâlnită în sensul selectat și ies numai după finalizarea tuturor proceselor.</p></section><section class="panel"><h2>Forma benzii</h2><div class="fields"><label style="grid-column:span 2">Lungime porțiune dreaptă <strong id="lengthLabel"></strong><input id="beltLength" type="range" min="80" max="560" step="10"></label><label>Lățime bandă (px)<input id="beltWidth" type="number" min="24" max="80" step="2"></label></div><p>Schimbă cât de alungită este banda ovală. Stațiile, intrarea și ieșirea rămân atașate traseului. Modificarea geometriei resetează piesele curente.</p></section><section class="panel"><h2>Evacuare / buffer ieșire</h2><p>Buffer ieșire: maximum 1.000 de piese în așteptare. Piesele suplimentare rămân pe bandă până apare loc.</p><div class="fields"><label>Durată evacuare / piesă (s)<input id="exitDuration" type="number" min="0.1" max="3600" step="0.5"></label><label>Capacitate evacuare simultană<input id="exitCapacity" type="number" min="1" max="20" step="1"></label></div><div class="stats"><div class="stat"><b id="exitWaiting">0</b><small>În așteptare</small></div><div class="stat"><b id="exitActive">0</b><small>În evacuare</small></div><div class="stat"><b id="exitBlocked">0</b><small>Proces incomplet</small></div></div></section><section class="panel"><h2>Semafor și buffer între procese</h2><p>Există doar buffer BEFORE la fiecare stație. Piesele finalizate rămân în capacitatea stației precedente până la transfer. Când bufferul local este plin, blocajul se propagă în amonte, inclusiv spre stația precedentă. Segmentele din aval continuă să funcționeze. Alimentarea continuă cât timp există spațiu la INTRARE. ROȘU indică un buffer local saturat, nu oprirea întregii benzi.</p><div class="fields"><label>Buffer implicit între procese (piese)<input id="interBuffer" type="number" min="0" max="500" step="1"></label></div><div class="stats"><div class="stat"><b id="trafficStatus">VERDE</b><small>Semafor buffer local</small></div><div class="stat"><b id="waitingCount">0</b><small>Piese în buffer</small></div></div></section><section class="panel"><h2>Parametri globali</h2><div class="fields"><label>Viteză bandă <span id="speedLabel"></span><input id="speed" type="range" min=".2" max="4" step=".1"></label><label>Alimentare (s)<input id="feed" type="number" min=".5" max="120" step=".5"></label><label>Distanță minimă (px)<input id="spacing" type="number" min="15" max="100" step="5"></label></div><p>O tură durează 45 secunde la 1×. Dacă un buffer este plin, piesa așteaptă fără a depăși stația. Modificările de structură resetează simularea pentru consistență.</p></section>
+<section class="panel"><div class="station-head"><h2>Jurnal JSON (fără transmitere reală)</h2><div class="actions"><button id="exportEvents" class="alt">Export JSON</button><button id="clearLog" class="alt">Șterge</button></div></div><div id="log"></div></section></div>
+<div class="stack"><section class="panel"><div class="station-head"><h2>Stații și roboți</h2><div class="actions"><button id="addProcess">+ Proces</button><button id="addRobot" class="alt">+ Robot + proces</button></div></div><p>Poziția este procent din traseul benzii. Poți muta stațiile cu mouse-ul sau prin câmpul Poziție. Ordinea proceselor este ordinea fizică pe bandă.</p><div id="editor"></div><h2>Rutare / ordine logică</h2><p>Secvența este generată automat după poziția stațiilor, de la START la IEȘIRE, în sensul benzii. Stațiile cu același grup rămân alternative. Exemplu: <code>ST01,GRUP_A,ST03</code>. Grupul poate avea maximum 8 stații.</p><label>Secvență de procesare<input id="route" placeholder="ST01,GRUP_A,ST03"></label><div class="actions"><button id="applyRoute">Aplică ruta</button></div><p id="routeStatus"></p><h2>Poziții NOK</h2><div class="actions"><button id="addNok" class="alt">+ Poziție NOK</button></div><div id="nokEditor"></div></section>
+<section class="panel"><h2>Imagini de prezentare</h2><p>Adaugă imagini peste linie sau stații, ori imagini pentru piesă în funcție de etapa parcursă. Sunt păstrate în configurația exportată. Fișierele mari pot depăși limita de localStorage.</p><label>Titlu imagine<input id="imageTitle" placeholder="Robot, cameră, piesă asamblată"></label><div class="fields"><label>Tip imagine<select id="imageKind"><option value="overlay">Peste linie / stație</option><option value="product">Pe produs</option></select></label><label>Stație / etapă<select id="imageStation"></select></label><label>Dimensiune (px)<input id="imageSize" type="number" value="70" min="20" max="180"></label></div><label>Alege imagine<input id="imageFile" type="file" accept="image/*"></label><div class="actions"><button id="addImage">Adaugă imagine</button></div><p>Poți modifica ulterior tipul și asocierea fiecărei imagini, fără reîncărcare. Pentru imaginile piesei, selectează stația sau grupul după care trebuie afișate.</p><div id="imageEditor"></div></section><section class="panel"><h2>Evenimente configurabile</h2><label>Stație<select id="eventStation"></select></label><div class="fields"><label style="grid-column:span 2">Momentul evenimentului<select id="eventType"><option value="piece_arrived">Sosire la stație</option><option value="piece_picked">Ridicare finalizată</option><option value="process_started">Proces început</option><option value="process_completed">Proces finalizat</option><option value="piece_returned">Repunere pe bandă</option></select></label></div><label>JSON suplimentar<textarea id="payload" spellcheck="false"></textarea></label><p>Variabile: <code>{{pieceId}}</code>, <code>{{stationId}}</code>, <code>{{stationName}}</code>, <code>{{event}}</code>, <code>{{time}}</code>, <code>{{timestamp}}</code>, <code>{{cycle}}</code>.</p><div class="actions"><button id="applyPayload">Aplică JSON</button><button id="preview">Previzualizare</button></div><p id="message"></p></section></div></main>
+<script>
+(()=>{'use strict';
+const $=id=>document.getElementById(id),svgNS='http://www.w3.org/2000/svg',track=$('track');let L=track.getTotalLength();
+const TYPES=['piece_arrived','piece_picked','process_started','process_completed','piece_returned'];
+const defaultPayload={piece_arrived:{serial:"{{pieceId}}",station:"{{stationName}}"},process_completed:{result:"OK",cycle_time_s:4}};
+const defaults={speed:1,feed:3,spacing:35,entryPos:0,exitPos:.9,direction:1,beltLength:560,beltWidth:55,exitDuration:8,exitCapacity:1,interBuffer:4,route:["ST01","ST02","ST03"],noks:[],images:[],stations:[
+{id:'ST01',name:'Înșurubare',pos:.14,type:'process',capacity:3,duration:4,pick:1,put:1,robotCapacity:1,robotTime:1,processCapacity:1,beltBuffer:4,afterBuffer:4,payloads:structuredClone(defaultPayload)},
+{id:'ST02',name:'Montare robotizată',pos:.34,type:'robot',capacity:4,duration:6,pick:1,put:1,robotCapacity:1,robotTime:2,processCapacity:2,payloads:{piece_arrived:{robot:"R01",part:"{{pieceId}}"},process_completed:{result:"OK"}}},
+{id:'ST03',name:'Testare',pos:.67,type:'process',capacity:3,duration:5,pick:1,put:1,robotCapacity:1,robotTime:1,processCapacity:1,beltBuffer:4,afterBuffer:4,payloads:structuredClone(defaultPayload)}]};
+const clone=x=>JSON.parse(JSON.stringify(x)),clamp=(v,a,b)=>Number.isFinite(v)?Math.min(b,Math.max(a,v)):a,round=x=>Math.round(x*100)/100;
+function normalize(raw){if(!raw||!Array.isArray(raw.stations))throw Error('Configurație invalidă');let ids=new Set();let stations=raw.stations.slice(0,16).map((s,i)=>{let id=String(s.id||'ST'+(i+1));if(ids.has(id))id+='_'+i;ids.add(id);return {id,name:String(s.name||'Proces').slice(0,45),pos:clamp(Number(s.pos)||.1,.02,.98),type:s.type==='robot'?'robot':'process',capacity:clamp(Math.floor(Number(s.capacity)||3),1,40),duration:clamp(Number(s.duration)||4,.1,600),pick:clamp(Number(s.pick)||1,.1,120),put:clamp(Number(s.put)||1,.1,120),robotCapacity:clamp(Math.floor(Number(s.robotCapacity)||1),1,10),robotTime:clamp(Number(s.robotTime)||1,.1,120),processCapacity:clamp(Math.floor(Number(s.processCapacity)||1),1,10),beltBuffer:clamp(Math.floor(Number(s.beltBuffer??raw.interBuffer??4)),0,500),afterBuffer:clamp(Math.floor(Number(s.afterBuffer??4)),0,500),group:String(s.group||'').trim().slice(0,32),failRate:clamp(Number(s.failRate??0),0,100),payloads:s.payloads&&typeof s.payloads==='object'?s.payloads:clone(defaultPayload)}});return {allowIncompleteExit:raw.allowIncompleteExit===true,speed:clamp(Number(raw.speed)||1,.2,4),feed:clamp(Number(raw.feed)||3,.5,120),spacing:clamp(Number(raw.spacing)||35,15,100),entryPos:clamp(Number(raw.entryPos??0),0,.999),exitPos:clamp(Number(raw.exitPos??.9),0,.999),direction:Number(raw.direction)===-1?-1:1,beltLength:clamp(Number(raw.beltLength??560),80,560),beltWidth:clamp(Number(raw.beltWidth??55),24,80),exitDuration:clamp(Number(raw.exitDuration??8),.1,3600),exitCapacity:clamp(Math.floor(Number(raw.exitCapacity??1)),1,20),interBuffer:clamp(Math.floor(Number(raw.interBuffer??4)),0,500),route:Array.isArray(raw.route)?raw.route.map(String):stations.map(x=>x.id),noks:Array.isArray(raw.noks)?raw.noks.slice(0,30).map(n=>({id:String(n.id),name:String(n.name||'NOK'),pos:clamp(Number(n.pos)||0,0,.999)})):[],images:Array.isArray(raw.images)?raw.images.slice(0,40).filter(x=>typeof x.src==='string'&&x.src.startsWith('data:image/')).map(x=>({id:String(x.id),title:String(x.title||''),kind:x.kind==='product'?'product':'overlay',station:String(x.station||''),size:clamp(Number(x.size)||70,20,180),x:Number(x.x)||480,y:Number(x.y)||280,src:x.src})):[],stations};}
+let cfg;try{cfg=normalize(JSON.parse(localStorage.getItem('sim_v26')||localStorage.getItem('sim_v19')||localStorage.getItem('sim_v18')||localStorage.getItem('sim_v13')||localStorage.getItem('sim_v03')))}catch{cfg=normalize(defaults)}
+let trafficRed=false,trafficReason='',pieces=[],events=[],pendingLogs=[],exitQueue=[],exitJobs=[],exitBlocked=[],seq=0,finished=0,incompleteUnloaded=0,nokCount=0,eventTotal=0,clock=0,feedClock=0,running=true,last=performance.now(),accumulator=0,selected=cfg.stations[0]?.id||'',drag=null;
+const STEP_SECONDS=.05,MAX_EXIT_WAITING=1000,MAX_EXIT_BLOCKED=1000;
+let entryEnabled=true,exitEnabled=true;
+const mod=x=>(x%1+1)%1,virtual=pos=>mod((pos-cfg.entryPos)*cfg.direction),world=pos=>mod(cfg.entryPos+cfg.direction*pos),ordered=()=>[...cfg.stations].sort((a,b)=>virtual(a.pos)-virtual(b.pos)),get=id=>cfg.stations.find(s=>s.id===id);
+// Ruta este intotdeauna ordinea fizica START -> IESIRE, in sensul benzii.
+// Grupele alternative raman o singura etapa la pozitia primei statii din grup.
+function processingOrder(){
+  const entries=[{token:'INTRARE',position:0},{token:'IEȘIRE',position:virtual(cfg.exitPos)}],seen=new Set();
+  for(const station of ordered()){
+    const token=station.group||station.id;
+    if(!seen.has(token)){seen.add(token);entries.push({token,position:virtual(station.pos)});}
+  }
+  return entries.sort((first,second)=>first.position-second.position).map(entry=>entry.token);
+}
+function syncPhysicalRoute(){
+  const exit=virtual(cfg.exitPos),seen=new Set(),route=[];
+  for(const st of ordered()){
+    const token=st.group||st.id;
+    if(!seen.has(token)){seen.add(token);route.push(token);}
+  }
+  cfg.route=route;
+  const outside=ordered().filter(st=>virtual(st.pos)>=exit-1e-8);
+  const status=$('routeStatus');
+  if(status)status.textContent=outside.length
+    ?(cfg.allowIncompleteExit?'Evacuare incompleta permisa. Statii dupa IESIRE: ':'⚠ Stații după IEȘIRE: ')+outside.map(st=>st.id).join(', ')+(cfg.allowIncompleteExit?'':'. Mută IEȘIRE după ultima stație sau permite evacuarea incompletelor.')
+    :'✓ Secvență automată START → IEȘIRE ('+(cfg.direction===1?'orar':'antiorar')+')';
+  const input=$('route');if(input)input.value=processingOrder().join(' → ');
+}
+
+function runtime(){for(const s of cfg.stations){s.enabled=s.enabled!==false;s.queue=[];s.jobs=[];s.returns=[];s.robotJobs=[];s.pending=[];s.completed=[];s.beltWaiting=[];s.beforeQueue=[];s.afterQueue=[];s.dispatchAttempt=null;}}
+function setOperationEnabled(target,enabled){
+  const station=get(target);
+  if(target==='entry')entryEnabled=enabled;
+  else if(target==='exit')exitEnabled=enabled;
+  else if(station)station.enabled=enabled;
+  else return;
+  emit(enabled?'operation_started':'operation_stopped',null,station,{operation:target});
+}
+function reset(){pieces=[];events=[];pendingLogs=[];exitQueue=[];exitJobs=[];exitBlocked=[];seq=finished=incompleteUnloaded=nokCount=eventTotal=clock=feedClock=accumulator=0;last=performance.now();trafficRed=false;trafficReason='';$('log').replaceChildren();runtime();draw();}
+function template(v,ctx){if(typeof v==='string')return v.replace(/\{\{(\w+)\}\}/g,(_,k)=>String(ctx[k]??''));if(Array.isArray(v))return v.map(x=>template(x,ctx));if(v&&typeof v==='object')return Object.fromEntries(Object.entries(v).map(([k,x])=>[k,template(x,ctx)]));return v}
+function emit(type,p,s,extra={}){let ctx={pieceId:p?.id||'',stationId:s?.id||'',stationName:s?.name||'',event:type,time:round(clock),timestamp:new Date().toISOString(),cycle:p?.cycles||0};let data=template(s?.payloads?.[type]||{},ctx);let evt={event:type,time_s:round(clock),piece_id:p?.id||null,station_id:s?.id||null,station_name:s?.name||null,...extra,custom:data};eventTotal++;events.push(evt);if(events.length>5000)events.shift();pendingLogs.push(evt);if(pendingLogs.length>130)pendingLogs.shift();}
+function flushLogs(){for(const evt of pendingLogs){let div=document.createElement('div');div.className='entry';div.textContent=JSON.stringify(evt);$('log').prepend(div);}pendingLogs=[];while($('log').children.length>130)$('log').lastChild.remove();}
+function occupied(s){return s.queue.length+s.jobs.length+s.robotJobs.length+s.pending.length+s.returns.length+s.completed.length}
+function take(p,s){p.mode='off';p.station=s.id;s.queue.push(p);emit('piece_arrived',p,s,{buffer_occupancy:occupied(s)});}
+function startRobot(s,dt){if(s.enabled===false)return;for(let i=s.robotJobs.length-1;i>=0;i--){let j=s.robotJobs[i];j.left-=dt;if(j.left<=1e-9){s.robotJobs.splice(i,1);if(j.phase==='pickup'){emit('piece_picked',j.p,s);s.pending.push(j.p)}else{s.completed.push(j.p);emit('piece_ready_to_return',j.p,s)}}}
+const handlingCapacity=s.type==='robot'?s.robotCapacity:s.processCapacity;
+while(s.robotJobs.length<handlingCapacity&&(s.returns.length||s.queue.length)){
+  const returning=s.returns.length>0,p=returning?s.returns.shift():s.queue.shift();
+  s.robotJobs.push({p,phase:returning?'return':'pickup',left:(returning?s.put:s.pick)+(s.type==='robot'?s.robotTime:0)});
+  emit(returning?'piece_return_started':'robot_pick_started',p,s);
+}
+
+}
+function processJobs(s,dt){
+  if(s.enabled===false)return;
+  for(let i=s.jobs.length-1;i>=0;i--){
+    const j=s.jobs[i];j.left-=dt;
+    if(j.left<=1e-9){
+      s.jobs.splice(i,1);
+      j.p.failed=Math.random()*100<s.failRate;
+      if(j.p.failed){j.p.nokTarget=nearestNok(s.pos);emit('process_failed',j.p,s,{result:'NOK'});}
+      else emit('process_completed',j.p,s,{result:'OK'});
+      // Piesa procesata ramane in capacitatea statiei pana la predare.
+      s.returns.push(j.p);
+    }
+  }
+  const source=s.pending;
+  while(s.jobs.length<s.processCapacity && source.length){
+    const p=source.shift();
+    s.jobs.push({p,left:s.duration});emit('process_started',p,s);
+  }
+}
+function freeAt(pos,gap){return !pieces.some(p=>p.mode==='belt'&&Math.min(Math.abs(p.pos-pos),1-Math.abs(p.pos-pos))<gap-1e-8);}
+function nearestNok(pos){let n=[...cfg.noks].sort((a,b)=>mod(virtual(a.pos)-virtual(pos))-mod(virtual(b.pos)-virtual(pos)));return n[0]||null}
+function stageOptions(token){return cfg.stations.filter(s=>s.id===token||s.group===token)}
+function chooseStation(p){let token=cfg.route[p.next];if(!token)return null;let candidates=stageOptions(token).sort((a,b)=>mod(virtual(a.pos)-p.pos)-mod(virtual(b.pos)-p.pos));return candidates}
+// Transfer determinist AFTER -> capacitatea / BEFORE a etapei urmatoare.
+// Nu depinde de spatiul liber pe banda; FIFO si fara rezervari fantoma.
+function incomingReservations(st){
+  return pieces.filter(p=>p.mode==='belt' && !p.failed &&
+    stageOptions(cfg.route[p.next]).some(t=>t.id===st.id) && p.reservedFor===st.id).length;
+}
+// AFTER -> banda -> BEFORE/procesare. Rezervam locul la destinatie
+// cat timp piesa se deplaseaza fizic, pentru a preveni supraumplerea.
+function dispatchPosition(source,gap,targets=[]){
+  const base=virtual(source.pos);
+  const limit=Math.min(mod(virtual(cfg.exitPos)-base),...targets.map(target=>mod(virtual(target.pos)-base)));
+  if(source.dispatchAttempt?.clock===clock&&source.dispatchAttempt.limit===limit)return null;
+  // Cautam un punct de reintrare liber pe segmentul de dupa statie,
+  // nu numai fix la centrul statiei (unde o piesa poate sta stationata).
+  for(let i=0;i<=12;i++){
+    const pos=mod(base+i*gap*1.1);
+    if(i>0&&i*gap*1.1>=limit-1e-8)break;
+    if(freeAt(pos,gap))return pos;
+  }
+  source.dispatchAttempt={clock,limit};
+  return null;
+}
+function drainAfter(){
+  let changed=false, gap=cfg.spacing/L;
+  for(let k=cfg.route.length-1;k>=0;k--){
+    for(const source of stageOptions(cfg.route[k])){
+      if(source.enabled===false)continue;
+      while(source.completed.length){
+        const p=source.completed[0];
+        if(p.failed){
+          if(!freeAt(virtual(source.pos),gap))break;
+          source.completed.shift();p.mode='belt';p.pos=virtual(source.pos);
+          emit('piece_returned',p,source);changed=true;break;
+        }
+        const targets=stageOptions(cfg.route[p.next+1]);
+        const exitDistance=mod(virtual(cfg.exitPos)-virtual(source.pos));
+        const exitBeforeNext=targets.length>0&&targets.every(target=>mod(virtual(target.pos)-virtual(source.pos))>=exitDistance-1e-8);
+        if(!targets.length||(cfg.allowIncompleteExit&&exitBeforeNext)){
+          // Ultima operatie: piesa revine vizibil pe banda si merge catre EXIT.
+          // Nu o transferam direct in exitQueue.
+          const departure=dispatchPosition(source,gap);
+          if(departure===null)break;
+          source.completed.shift();p.next=targets.length?p.next+1:cfg.route.length;
+          p.stageImages.push(source.id,source.group);
+          p.mode='belt';p.station=null;p.pos=departure;
+          delete p.reservedFor;
+          emit('piece_dispatched_to_exit',p,source);changed=true;
+          break;
+        }
+        const target=targets.find(t=>
+          t.enabled!==false&&occupied(t)+t.beforeQueue.length+incomingReservations(t)<t.capacity+t.beltBuffer);
+        if(!target)break;
+        const departure=dispatchPosition(source,gap,[target]);
+        if(departure===null)break;
+        source.completed.shift();p.next++;
+        p.stageImages.push(source.id,source.group);
+        p.mode='belt';p.station=null;p.pos=departure;
+        p.reservedFor=target.id;
+        emit('piece_dispatched',p,source,{to_station:target.id});changed=true;
+        break;
+      }
+    }
+  }
+  return changed;
+}
+function step(dt){
+clock+=dt;if(entryEnabled)feedClock+=dt;const gap=cfg.spacing/L,order=ordered(),speed=dt*cfg.speed/45,eps=.000001;
+// Unloading and station processing continue independently of congestion.
+// Finished parts in returns are an outbound FIFO, NOT occupied process slots.
+// A blocked physical return point may delay dispatch but cannot stop processing.
+if(exitEnabled){
+if(cfg.allowIncompleteExit){
+  while(exitBlocked.length&&exitQueue.length<MAX_EXIT_WAITING){
+    const part=exitBlocked.shift();part.mode='exit';part.incomplete=true;part.remainingStages=cfg.route.slice(part.next);
+    delete part.reservedFor;exitQueue.push(part);
+    emit('incomplete_piece_entered_exit_buffer',part,null,{remaining_stages:part.remainingStages});
+  }
+}
+for(let i=exitJobs.length-1;i>=0;i--){let j=exitJobs[i];j.left-=dt;if(j.left<=1e-9){exitJobs.splice(i,1);if(j.p.incomplete)incompleteUnloaded++;else finished++;emit(j.p.incomplete?'incomplete_piece_unloaded':'piece_unloaded',j.p,null,{exit_duration_s:cfg.exitDuration,...(j.p.incomplete?{remaining_stages:j.p.remainingStages}:{})});}}
+while(exitJobs.length<cfg.exitCapacity&&exitQueue.length){let p=exitQueue.shift();exitJobs.push({p,left:cfg.exitDuration});emit('exit_processing_started',p,null,{exit_active:exitJobs.length});}
+}
+// Eliberam AFTER inainte de a evalua finalizarea joburilor, astfel
+// o piesa terminata nu ramane blocata din cauza unei cozi transferabile.
+drainAfter();
+for(let st of order){processJobs(st,dt);startRobot(st,dt);processJobs(st,0);}
+drainAfter();
+// Deterministic, discrete FIFO buffers. BEFORE and AFTER are separate
+// capacity-limited inventories. No red-light state ever drives a transfer.
+for(const st of order){
+  if(st.enabled===false)continue;
+  while(st.beforeQueue.length && occupied(st)<st.capacity){
+    const p=st.beforeQueue.shift();take(p,st);
+    emit('before_buffer_released',p,st,{remaining:st.beforeQueue.length});
+  }
+}
+drainAfter();
+// Cand READY a fost golit, capacitatea se elibereaza in acelasi tick.
+// Nu asteptam un nou eveniment de sosire pentru a porni urmatoarea piesa.
+for(const st of order)processJobs(st,0);
+function stageFull(index){
+  if(index<0||index>=cfg.route.length)return false;
+  const opts=stageOptions(cfg.route[index]);
+  if(cfg.allowIncompleteExit&&opts.every(st=>virtual(st.pos)>=virtual(cfg.exitPos)-eps))return false;
+  return opts.length>0&&opts.every(st=>st.enabled===false||(occupied(st)>=st.capacity&&st.beforeQueue.length>=st.beltBuffer));
+}
+const feederBlocked=stageFull(0);
+
+// Piesele finalizate sunt expediate din completed catre BEFORE-ul urmator.
+// Reincercam in fiecare tick; nu exista latch de blocare.
+drainAfter();
+// Move from downstream to upstream so each piece respects the UPDATED position
+// of the piece in front. A blocked station creates a physical accumulation,
+// without freezing downstream conveyor sections or their processes.
+const belt=pieces.filter(p=>p.mode==='belt').sort((a,b)=>b.pos-a.pos);
+// redStations derived from deterministic buffers
+for(let beltIndex=0;beltIndex<belt.length;beltIndex++){
+const p=belt[beltIndex];
+const start=p.pos;
+let ahead=Infinity;for(let offset=1;offset<belt.length;offset++){const front=belt[(beltIndex-offset+belt.length)%belt.length];if(front.mode!=='belt')continue;const separation=mod(front.pos-start);if(separation>eps){ahead=separation;break;}}
+let distance=Math.min(speed,ahead===undefined?speed:Math.max(0,ahead-gap));
+const endpoint=virtual(cfg.exitPos),exitDist=mod(endpoint-start);
+if(p.failed){let target=p.nokTarget?virtual(p.nokTarget.pos):endpoint,dist=mod(target-start);if(dist<=distance+eps){if(!p.nokTarget&&!exitEnabled){p.pos=endpoint;continue;}p.mode='done';nokCount++;emit('piece_rejected',p,null,{nok_id:p.nokTarget?.id||null});continue}}
+else if(p.next>=cfg.route.length){if(exitDist<=distance+eps){if(!exitEnabled||exitQueue.length>=MAX_EXIT_WAITING){p.pos=endpoint;continue;}p.mode='exit';exitQueue.push(p);emit('piece_entered_exit_buffer',p,null,{exit_buffer_size:exitQueue.length});continue}}
+else{
+let candidates=p.reservedFor?cfg.stations.filter(st=>st.id===p.reservedFor):(chooseStation(p)||[]);
+if(!p.reservedFor&&candidates.some(st=>st.enabled!==false))candidates=candidates.filter(st=>st.enabled!==false);
+// Examine a station even when it is only a fraction of a pixel ahead.
+// An admitted waiting part has a fixed stop point and cannot pass the station.
+let hits=candidates.map(st=>({st,d:Math.abs(virtual(st.pos)-start)<eps?0:mod(virtual(st.pos)-start)}))
+  .filter(x=>x.d<=distance+gap+eps&&x.d<exitDist-eps)
+  .sort((x,y)=>x.d-y.d);
+// A station must accept and process its own parts whenever it has internal
+// capacity. Saturation of the NEXT stage only interlocks its output, never
+// its input or its processing operation.
+let chosen=hits.find(x=>x.st.enabled!==false&&x.d<=distance+eps&&(occupied(x.st)<x.st.capacity || x.st.beforeQueue.length<x.st.beltBuffer));
+if(chosen){
+  p.pos=virtual(chosen.st.pos);
+  if(occupied(chosen.st)<chosen.st.capacity){delete p.reservedFor;take(p,chosen.st)}
+  else{p.mode='off';p.station=chosen.st.id;delete p.reservedFor;chosen.st.beforeQueue.push(p);
+    emit('part_entered_interprocess_buffer',p,chosen.st,{waiting:chosen.st.beforeQueue.length,limit:chosen.st.beltBuffer});}
+  continue;
+}
+const blocked=hits.find(x=>x.st.enabled===false||(occupied(x.st)>=x.st.capacity&&x.st.beforeQueue.length>=x.st.beltBuffer));
+if(blocked){
+  // No admission: this piece waits on the conveyor; downstream processes
+  // remain active. The preceding producer's AFTER inventory fills naturally.
+  distance=Math.min(distance,Math.max(0,blocked.d-gap));
+}else if(exitDist<=distance+eps){
+  if(!exitEnabled||(cfg.allowIncompleteExit?exitQueue.length>=MAX_EXIT_WAITING:exitBlocked.length>=MAX_EXIT_BLOCKED)){p.pos=endpoint;continue;}
+  if(cfg.allowIncompleteExit){
+    p.mode='exit';p.incomplete=true;p.remainingStages=cfg.route.slice(p.next);delete p.reservedFor;exitQueue.push(p);
+    emit('incomplete_piece_entered_exit_buffer',p,null,{remaining_stages:p.remainingStages});
+    continue;
+  }
+  p.mode='exit_blocked';exitBlocked.push(p);
+  emit('piece_held_at_exit',p,null,{reason:'incomplete_processes',remaining_stages:cfg.route.slice(p.next)});
+  continue;
+}
+}
+let next=start+distance;p.pos=mod(next);if(next>=1){p.cycles++;emit('piece_recircled',p,null,{cycle:p.cycles})}
+}
+// redStations derived from deterministic buffers
+for(const st of order){st.beltWaitingCount=st.beforeQueue.length;}
+// Semaforul reflecta starea ACTUALA a bufferelor; nu pastreaza un latch rosu.
+for(let i=0;i<cfg.route.length;i++){
+  for(const st of stageOptions(cfg.route[i]))st.outputBlocked=stageFull(i+1);
+}
+let redStations=new Set(order.filter(st=>st.enabled===false||(occupied(st)>=st.capacity&&st.beforeQueue.length>=st.beltBuffer)).map(st=>st.id));
+let previousRed=trafficRed;trafficRed=redStations.size>0||feederBlocked;
+trafficReason=[...(feederBlocked?['FEEDER']:[]),...redStations].join(', ');
+if(previousRed!==trafficRed)emit(trafficRed?'upstream_station_blocked':'upstream_station_unblocked',null,null,{stations:trafficReason});
+// Feed remains enabled as long as there is physical room at INPUT.
+if(entryEnabled&&feedClock+1e-9>=cfg.feed&&!feederBlocked&&exitBlocked.length<MAX_EXIT_BLOCKED&&freeAt(0,gap)){feedClock=Math.max(0,feedClock-cfg.feed);let p={id:'P'+String(++seq).padStart(4,'0'),pos:0,mode:'belt',next:0,cycles:0,failed:false,nokTarget:null,stageImages:[]};pieces.push(p);emit('piece_loaded',p,null)}
+feedClock=Math.min(feedClock,cfg.feed);
+pieces=pieces.filter(p=>p.mode==='belt'||p.mode==='off');
+}
+function el(tag,attrs={},text){let n=document.createElementNS(svgNS,tag);for(let [k,v] of Object.entries(attrs))n.setAttribute(k,v);if(text!==undefined)n.textContent=text;return n}
+function point(pos){return track.getPointAtLength(pos*L)}
+function updateGeometry(){let half=cfg.beltLength/2,left=480-half,right=480+half,top=145,bottom=415,r=135;let d=`M${left} ${top} H${right} A${r} ${r} 0 0 1 ${right} ${bottom} H${left} A${r} ${r} 0 0 1 ${left} ${top} Z`;track.setAttribute('d',d);$('trackDashes').setAttribute('d',d);track.setAttribute('stroke-width',cfg.beltWidth);L=track.getTotalLength();$('lengthLabel').textContent=cfg.beltLength+' px';$('beltLength').value=cfg.beltLength;$('beltWidth').value=cfg.beltWidth;}
+function pieceImage(piece){
+  const ims=[...cfg.images].reverse().filter(x=>x.kind==='product');
+  return [...(piece.stageImages||[])].reverse().map(stage=>ims.find(x=>x.station===stage)).find(Boolean)
+    ||ims.find(x=>!x.station)||null;
+}
+function renderOperationControls(){
+  function mount(root,target,text,enabled){
+    if(!root)return;
+    let input=root.querySelector('input[data-operation]');
+    if(!input){
+      const label=document.createElement('label'),status=document.createElement('span');
+      label.style.cssText='display:flex;align-items:center;gap:7px;margin:8px 0;cursor:pointer';
+      input=document.createElement('input');input.type='checkbox';input.dataset.operation=target;
+      input.style.cssText='width:18px;height:18px;margin:0;accent-color:#2967df';
+      input.setAttribute('aria-label',text);
+      input.onchange=()=>{setOperationEnabled(target,input.checked);draw();};
+      label.append(input,status);root.append(label);
+    }
+    input.checked=enabled;
+    const status=text+': '+(enabled?'PORNIT':'OPRIT');
+    if(input.nextElementSibling.textContent!==status)input.nextElementSibling.textContent=status;
+  }
+  mount($('entryPos').closest('section').querySelector('.actions'),'entry','INTRARE',entryEnabled);
+  mount($('exitDuration').closest('section'),'exit','IEȘIRE',exitEnabled);
+  let incompleteControl=$('allowIncompleteExit');
+  if(!incompleteControl){
+    const label=document.createElement('label'),text=document.createElement('span');
+    label.style.cssText='display:flex;align-items:center;gap:7px;margin:10px 0;cursor:pointer';
+    incompleteControl=document.createElement('input');incompleteControl.type='checkbox';incompleteControl.id='allowIncompleteExit';
+    incompleteControl.style.cssText='width:18px;height:18px;margin:0;accent-color:#2967df';
+    text.textContent='Permite evacuarea pieselor incomplete';label.append(incompleteControl,text);
+    $('routeStatus').insertAdjacentElement('afterend',label);
+    incompleteControl.onchange=()=>{cfg.allowIncompleteExit=incompleteControl.checked;syncPhysicalRoute();draw();};
+    const stat=document.createElement('div'),counter=document.createElement('b'),caption=document.createElement('small');
+    stat.className='stat';counter.id='incompleteUnloaded';caption.textContent='Incomplete evacuate';stat.append(counter,caption);
+    $('exitDuration').closest('section').querySelector('.stats').append(stat);
+  }
+  incompleteControl.checked=cfg.allowIncompleteExit===true;
+  $('incompleteUnloaded').textContent=incompleteUnloaded;
+  for(const [index,station] of ordered().entries()){
+    mount($('editor').children[index]?.querySelector('.station-head .actions'),station.id,'PROCES',station.enabled!==false);
+  }
+}
+function draw(){renderOperationControls();flushLogs();let g=$('stationsSvg'),pg=$('partsSvg');g.replaceChildren();pg.replaceChildren();
+let light=$('trafficSvg');light.replaceChildren();light.append(el('rect',{x:10,y:200,width:118,height:65,rx:10,fill:'#152337',stroke:trafficRed?'#ff5555':'#36d88c','stroke-width':3}));light.append(el('circle',{cx:34,cy:223,r:12,fill:trafficRed?'#ff3333':'#452b31'}));light.append(el('circle',{cx:34,cy:248,r:12,fill:trafficRed?'#244634':'#25d77b'}));light.append(el('text',{x:54,y:229,fill:'#fff','font-size':12,'font-weight':700},trafficRed?'BUFFER':'RUN'));light.append(el('text',{x:54,y:249,fill:'#d1e0f3','font-size':10},trafficRed?'LOCAL FULL':'CONVEYOR'));$('trafficStatus').textContent=trafficRed?'ROȘU · BUFFER LOCAL':'VERDE · RUN';$('trafficStatus').style.color=trafficRed?'#ff5555':'#30d98b';$('waitingCount').textContent=cfg.stations.reduce((n,st)=>n+(st.beltWaitingCount||0),0);
+for(let s of cfg.stations){let p=point(s.pos),dx=p.x-480,dy=p.y-280,mag=Math.hypot(dx/1.6,dy)||1,sign=dy<0?-1:1;
+let bx=clamp(p.x-68,4,820),by=sign<0?12:465,color=s.type==='robot'?'#c89bff':'#eeb566';
+if(p.x<125||p.x>835){bx=p.x<480?12:812;by=clamp(p.y-36,80,450)}
+let endX=bx+68,endY=by+38;
+g.append(el('line',{x1:p.x,y1:p.y,x2:endX,y2:endY,stroke:color,'stroke-width':2,'stroke-dasharray':'5 4'}));
+if(s.type==='robot'){let tx=clamp(bx+130,155,780),ty=by<250?by+3:by-3;g.append(el('rect',{x:tx,y:ty,width:46,height:34,rx:7,fill:'#3d2d5b',stroke:'#b68cff','stroke-width':2}));g.append(el('text',{x:tx+23,y:ty+21,'text-anchor':'middle',fill:'#f2e6ff','font-size':12,'font-weight':700},'P'));g.append(el('line',{x1:bx+130,y1:by+20,x2:tx,y2:ty+17,stroke:'#a58ad5','stroke-dasharray':'3 3'}));}
+let node=el('g',{'class':'station-node','data-id':s.id});
+// BEFORE FIFO and READY completed pieces (not an AFTER buffer); the station itself is not stopped by a full BEFORE buffer.
+const beforeN=s.beforeQueue.length,afterN=s.completed.length;
+const beforeFull=s.beltBuffer>0&&beforeN>=s.beltBuffer;
+const afterFull=false;
+const stationRed=s.enabled===false||beforeFull||afterFull||!!s.outputBlocked;
+const stationAmber=!stationRed&&(beforeN>0||afterN>0);
+const lampColor=stationRed?'#ff4949':stationAmber?'#f8c344':'#33e08b';
+const jobs=s.jobs||[];
+const progress=jobs.length?jobs.reduce((a,j)=>a+Math.max(0,Math.min(1,1-j.left/Math.max(.1,s.duration))),0)/jobs.length:0;
+const boxH=110;
+by=clamp(by,8,550-boxH);
+node.append(el('rect',{x:bx,y:by,width:132,height:boxH,rx:9,fill:'#223751',stroke:selected===s.id?'#7fc7ff':color,'stroke-width':selected===s.id?3:2}));
+node.append(el('text',{x:bx+10,y:by+17,fill:'#f2f6ff','font-size':12,'font-weight':700},s.name.slice(0,15)));
+// Tiny station-local traffic light: green=flow, amber=waiting, red=full/blocked.
+node.append(el('rect',{x:bx+111,y:by+5,width:15,height:28,rx:5,fill:'#111a27',stroke:'#66788d','stroke-width':.7}));
+node.append(el('circle',{cx:bx+118.5,cy:by+12,r:4.3,fill:stationRed?'#ff4949':'#442a32'}));
+node.append(el('circle',{cx:bx+118.5,cy:by+19,r:4.3,fill:stationAmber?'#f8c344':'#514629'}));
+node.append(el('circle',{cx:bx+118.5,cy:by+26,r:4.3,fill:!stationRed&&!stationAmber?'#33e08b':'#244435'}));
+node.append(el('text',{x:bx+10,y:by+34,fill:'#b7c9df','font-size':10},'Proces: '+jobs.length+'/'+s.processCapacity+' · '+occupied(s)+'/'+s.capacity));
+node.append(el('rect',{x:bx+9,y:by+42,width:114,height:10,rx:3,fill:'#0f2034',stroke:'#52677c','stroke-width':.6}));
+node.append(el('rect',{x:bx+9,y:by+42,width:114*progress,height:10,rx:3,fill:'#55adff'}));
+node.append(el('text',{x:bx+66,y:by+64,'text-anchor':'middle',fill:'#e2f3ff','font-size':10},jobs.length?(Math.round(progress*100)+'% · '+(Math.round(progress*s.duration*10)/10)+'/'+s.duration+'s'):'Așteaptă proces'));
+function bufferGraphic(x,y,label,count,max,fill){
+  node.append(el('text',{x,y:y-3,fill:'#c7d8e9','font-size':9},label+' '+count+'/'+max));
+  const slots=Math.max(1,Math.min(6,max));
+  for(let i=0;i<slots;i++){
+    let active=i<Math.ceil(count/Math.max(1,max)*slots);
+    node.append(el('rect',{x:x+i*17,y,width:14,height:10,rx:2,fill:active?fill:'#101f30',stroke:active?fill:'#52677c','stroke-width':.7}));
+  }
+}
+bufferGraphic(bx+9,by+78,'BEFORE',beforeN,s.beltBuffer,'#f8c344');
+bufferGraphic(bx+9,by+99,'READY',afterN,s.capacity,'#ff91a4');
+// Miniaturi ale imaginilor pieselor inclusiv in BEFORE / AFTER.
+for(const [queue,yy] of [[s.beforeQueue,by+78],[s.completed,by+99]]){
+  const slots=Math.max(1,Math.min(6,queue===s.beforeQueue?s.beltBuffer:s.capacity));
+  queue.slice(0,slots).forEach((piece,i)=>{
+    const im=pieceImage(piece);
+    if(im)node.append(el('image',{href:im.src,x:bx+9+i*17,y:yy,width:14,height:10,preserveAspectRatio:'xMidYMid meet'}));
+  });
+}
+node.append(el('circle',{cx:p.x,cy:p.y,r:13,fill:color,stroke:'#e6f3ff','stroke-width':2}));
+node.append(el('text',{x:p.x,y:p.y+4,'text-anchor':'middle',fill:'#16243b','font-size':11,'font-weight':700},s.type==='robot'?'R':'S'));
+g.append(node);
+let parked=[...pieces.filter(x=>x.mode==='belt'&&x.blockedFor===s.id).map(x=>[x,'#ff5656']),...s.queue.map(x=>[x,'#ffc56f']),...s.pending.map(x=>[x,'#ffc56f']),...s.robotJobs.map(x=>[x.p,'#a78bfa']),...s.jobs.map(x=>[x.p,'#73e1a4']),...(s.completed||[]).map(x=>[x,'#ff91a4']),...s.returns.map(x=>[x,'#ff91a4']),/* BEFORE and READY shown as mini-slot buffers */];parked.slice(0,7).forEach(([piece,c],i)=>{let xx=bx+5+i*18,yy=by<280?by+82:by-18;g.append(el('rect',{x:xx,y:yy,width:16,height:13,rx:3,fill:c}));});}
+for(let p of pieces.filter(x=>x.mode==='belt')){let xy=point(world(p.pos));let image=pieceImage(p);if(image){pg.append(el('image',{href:image.src,x:xy.x-13,y:xy.y-13,width:26,height:26,preserveAspectRatio:'xMidYMid meet'}));continue;}pg.append(el('rect',{x:xy.x-12,y:xy.y-10,width:24,height:20,rx:5,fill:'#5eb7ff',stroke:'#e6f5ff','stroke-width':1.5}));pg.append(el('text',{x:xy.x,y:xy.y+3,'text-anchor':'middle','font-size':9,'font-weight':700,fill:'#0c2440'},p.id.slice(-2)));}
+drawOverlays();drawPorts();let ep=point(cfg.exitPos),eg=el('g');let bx=clamp(ep.x-65,10,820),by=ep.y<280?clamp(ep.y+48,30,490):clamp(ep.y-100,30,490);eg.append(el('rect',{x:bx,y:by,width:130,height:48,rx:8,fill:'#145e4d',stroke:'#77e3bd','stroke-width':2}));eg.append(el('text',{x:bx+65,y:by+18,'text-anchor':'middle',fill:'white','font-size':12,'font-weight':700},'EXIT BUFFER '+MAX_EXIT_WAITING));eg.append(el('text',{x:bx+65,y:by+36,'text-anchor':'middle',fill:'#b9ffe6','font-size':12},(exitQueue.length+exitJobs.length)+' waiting / active'));$('overlaysSvg').append(eg);$('done').textContent=finished;$('beltCount').textContent=pieces.filter(x=>x.mode==='belt').length;$('offCount').textContent=pieces.filter(x=>x.mode==='off').length;$('eventCount').textContent=eventTotal;$('eventCount').title='Total evenimente; exportul pastreaza ultimele 5000.';$('nokCount').textContent=nokCount;$('exitBufferCount').textContent=exitQueue.length+exitJobs.length+exitBlocked.length;$('exitWaiting').textContent=exitQueue.length;$('exitActive').textContent=exitJobs.length;$('exitBlocked').textContent=exitBlocked.length;
+}
+function drawOverlays(){let g=$('overlaysSvg');g.replaceChildren();for(let n of cfg.noks){let p=point(n.pos),group=el('g',{'data-nok':n.id,style:'cursor:grab'});group.append(el('circle',{cx:p.x,cy:p.y,r:18,fill:'#a72f4a',stroke:'#fff','stroke-width':2}));group.append(el('text',{x:p.x,y:p.y+4,'text-anchor':'middle',fill:'white','font-size':11,'font-weight':700},'NOK'));group.append(el('text',{x:p.x,y:p.y+33,'text-anchor':'middle',fill:'#ffb6c5','font-size':12},n.name));g.append(group)}
+for(let im of cfg.images.filter(x=>x.kind==='overlay')){let station=get(im.station),p=station?point(station.pos):{x:im.x,y:im.y};let group=el('g',{'data-image':im.id,style:'cursor:grab'});group.append(el('image',{href:im.src,x:p.x-im.size/2,y:p.y-im.size/2,width:im.size,height:im.size,preserveAspectRatio:'xMidYMid meet'}));group.append(el('text',{x:p.x,y:p.y-im.size/2-5,'text-anchor':'middle',fill:'#f4f5ff','font-size':12,'font-weight':700,'paint-order':'stroke',stroke:'#122139','stroke-width':3},im.title));g.append(group)}}
+function renderAdvanced(){syncPhysicalRoute();$('route').readOnly=true;$('route').title='Secvență automată calculată după pozițiile fizice și sensul benzii';$('route').value=processingOrder().join(' → ');let r=$('nokEditor');r.replaceChildren();for(let n of cfg.noks){let row=document.createElement('div');row.className='fields';let name=document.createElement('input');name.value=n.name;name.onchange=()=>{n.name=name.value;draw()};let pos=document.createElement('input');pos.type='number';pos.min=0;pos.max=100;pos.value=Math.round(n.pos*100);pos.onchange=()=>{n.pos=clamp(+pos.value/100,0,.999);draw()};let del=document.createElement('button');del.className='red';del.textContent='Șterge NOK';del.onclick=()=>{cfg.noks=cfg.noks.filter(x=>x!==n);renderAdvanced();draw()};row.append(name,pos,del);r.append(row)}
+let ir=$('imageEditor');ir.replaceChildren();for(let im of cfg.images){
+let card=document.createElement('div');card.className='imageAssignment';
+let preview=document.createElement('img');preview.src=im.src;preview.alt=im.title;preview.width=65;preview.height=65;preview.style.cssText='object-fit:contain;background:#fff;border-radius:6px;flex-shrink:0';
+let fields=document.createElement('div');fields.style.cssText='display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:8px;flex:1;min-width:0';
+function editor(label,control){let wrap=document.createElement('label');wrap.textContent=label;wrap.append(control);fields.append(wrap)}
+let title=document.createElement('input');title.value=im.title;title.onchange=()=>{im.title=title.value;draw()};editor('Titlu / Title',title);
+let kind=document.createElement('select');for(let [v,t] of [['overlay','Stație / Linie · Station / Line'],['product','Piesă · Product']]){let o=document.createElement('option');o.value=v;o.textContent=t;kind.append(o)}kind.value=im.kind;editor('Tip / Type',kind);
+let target=document.createElement('select');function populateTargets(){target.replaceChildren();let none=document.createElement('option');none.value='';none.textContent=im.kind==='product'?'Inițial / Initial':'Linie / Line';target.append(none);for(let st of cfg.stations){let o=document.createElement('option');o.value=st.id;o.textContent=st.name+' ('+st.id+')';target.append(o)}if(im.kind==='product'){for(let group of [...new Set(cfg.stations.map(x=>x.group).filter(Boolean))]){let o=document.createElement('option');o.value=group;o.textContent='Grup / Group: '+group;target.append(o)}}target.value=im.station||'';if(target.value!==im.station){im.station='';target.value=''}}populateTargets();editor('Asociere / Assignment',target);
+kind.onchange=()=>{im.kind=kind.value;im.station='';populateTargets();draw()};target.onchange=()=>{im.station=target.value;draw()};
+let size=document.createElement('input');size.type='number';size.min=20;size.max=180;size.value=im.size;size.onchange=()=>{im.size=clamp(+size.value||70,20,180);draw()};editor('Mărime / Size',size);
+let remove=document.createElement('button');remove.className='red';remove.textContent='Șterge / Delete';remove.onclick=()=>{cfg.images=cfg.images.filter(x=>x!==im);renderAdvanced();draw()};
+card.append(preview,fields,remove);ir.append(card)
+}}
+$('applyRoute').onclick=()=>{syncPhysicalRoute();changeStructure()};
+$('addNok').onclick=()=>{let n={id:'NOK'+Date.now(),name:'NOK '+(cfg.noks.length+1),pos:.8};cfg.noks.push(n);renderAdvanced();draw()};
+$('addImage').onclick=()=>{let file=$('imageFile').files[0];if(!file||!file.type.startsWith('image/'))return alert('Selectează o imagine');if(file.size>1200000)return alert('Imagine prea mare. Folosește sub 1.2 MB');let reader=new FileReader();reader.onload=()=>{cfg.images.push({id:'IMG'+Date.now(),title:$('imageTitle').value||file.name,kind:$('imageKind').value,station:$('imageStation').value,size:clamp(+$('imageSize').value||70,20,180),x:480,y:280,src:reader.result});renderAdvanced();draw()};reader.readAsDataURL(file)};
+function drawPorts(){let g=$('portsSvg');g.replaceChildren();for(let item of [{id:'entry',pos:cfg.entryPos,label:'INTRARE',color:'#2563eb'},{id:'exit',pos:cfg.exitPos,label:'IEȘIRE',color:'#15805d'}]){let p=point(item.pos),y=p.y<280?p.y+45:p.y-38;let group=el('g',{'data-port':item.id,style:'cursor:grab'});group.append(el('line',{x1:p.x,y1:p.y,x2:p.x,y2:y,stroke:item.color,'stroke-width':3}));group.append(el('rect',{x:p.x-45,y:y-17,width:90,height:34,rx:8,fill:item.color,stroke:'#fff','stroke-width':1.5}));group.append(el('text',{x:p.x,y:y+4,'text-anchor':'middle',fill:'white','font-size':12,'font-weight':700},item.label));group.append(el('circle',{cx:p.x,cy:p.y,r:12,fill:item.color,stroke:'white','stroke-width':2}));g.append(group)}let dir=el('text',{x:480,y:320,'text-anchor':'middle',fill:'#8ecaff','font-size':19,'font-weight':700},cfg.direction===1?'↻ ORAR':'↺ ANTIORAR');g.append(dir);for(let i=0;i<5;i++){let at=mod(i/5+clock*cfg.speed/45*cfg.direction),pt=point(at),pt2=point(mod(at+cfg.direction*.002)),angle=Math.atan2(pt2.y-pt.y,pt2.x-pt.x)*180/Math.PI;g.append(el('path',{d:'M-8 -5 L2 0 L-8 5',transform:`translate(${pt.x} ${pt.y}) rotate(${angle})`,fill:'none',stroke:'#ffffff','stroke-width':3,'stroke-linecap':'round','stroke-linejoin':'round',opacity:'.8'}));}}
+function syncPorts(){$('clockwise').style.background=cfg.direction===1?'#2967df':'#314763';$('counterclockwise').style.background=cfg.direction===-1?'#2967df':'#314763';$('entryPos').value=Math.round(cfg.entryPos*100);$('exitPos').value=Math.round(cfg.exitPos*100);$('direction').value=String(cfg.direction)}
+function changeStructure(){syncPhysicalRoute();updateGeometry();reset();renderEditor();renderSelect();renderAdvanced();}
+function field(grid,s,key,title,type='number',min=.1,max=600,step=.1,structural=false){let label=document.createElement('label');label.textContent=title;let input=document.createElement('input');input.type=type;input.value=key==='pos'?Math.round(s.pos*100):s[key];if(type==='number'){input.min=min;input.max=max;input.step=step;}input.onchange=()=>{let v=type==='number'?clamp(Number(input.value)||min,min,max):input.value.trim().slice(0,45);if(type==='number'&&step===1)v=Math.floor(v);s[key]=key==='pos'?v/100:v;if(structural||key==='pos'||key==='group')changeStructure();else{renderEditor();draw();}};label.append(input);grid.append(label);}
+function renderEditor(){let root=$('editor');root.replaceChildren();for(let s of ordered()){let card=document.createElement('div');card.className='station'+(s.id===selected?' selected':'');let head=document.createElement('div');head.className='station-head';let title=document.createElement('strong');title.textContent=s.id+' · '+(s.type==='robot'?'Robot + proces':'Proces');head.append(title);let actions=document.createElement('div');actions.className='actions';let edit=document.createElement('button');edit.textContent='Selectează';edit.className='alt';edit.onclick=()=>{selected=s.id;renderEditor();renderSelect()};let del=document.createElement('button');del.textContent='Șterge';del.className='red';del.onclick=()=>{if(!confirm('Ștergi '+s.name+'? Simularea se va reseta.'))return;cfg.stations=cfg.stations.filter(x=>x.id!==s.id);cfg.route=cfg.route.filter(x=>x!==s.id);selected=cfg.stations[0]?.id||'';changeStructure()};actions.append(edit,del);head.append(actions);card.append(head);let grid=document.createElement('div');grid.className='fields';field(grid,s,'name','Nume','text');field(grid,s,'pos','Poziție pe bandă (%)','number',2,98,1,true);field(grid,s,'capacity','Capacitate totală (piese)','number',1,40,1);field(grid,s,'beltBuffer','Buffer BEFORE (piese)','number',0,500,1);field(grid,s,'duration','Durată proces (s)');field(grid,s,'processCapacity','Procese paralele','number',1,8,1);field(grid,s,'group','Grup alternativ (ex. GRUP_A)','text');field(grid,s,'failRate','Rată FAIL (%)','number',0,100,1);if(s.type==='robot'){field(grid,s,'robotTime','Transport robot / sens (s)');field(grid,s,'robotCapacity','Capacitate robot (operații simultane)','number',1,10,1);field(grid,s,'pick','Prindere piesă (s)');field(grid,s,'put','Depunere piesă (s)');}else{field(grid,s,'pick','Ridicare (s)');field(grid,s,'put','Repunere (s)');}card.append(grid);let hint=document.createElement('div');hint.className='hint';hint.textContent=s.type==='robot'?'Robotul transferă piesa către procesul P, așteaptă un loc liber și o aduce înapoi. Capacitatea totală include toate etapele.':'Procesul este lângă bandă. Piesele intră în buffer FIFO.';card.append(hint);root.append(card)}}
+function renderSelect(){let imgSel=$('imageStation');imgSel.replaceChildren();let none=document.createElement('option');none.value='';none.textContent='Linie / fără stație';imgSel.append(none);for(let s of cfg.stations){let op=document.createElement('option');op.value=s.id;op.textContent=s.name;imgSel.append(op)}let sel=$('eventStation'),old=sel.value;sel.replaceChildren();for(let s of ordered()){let opt=document.createElement('option');opt.value=s.id;opt.textContent=s.name+' ('+s.id+')';sel.append(opt)}sel.value=get(old)?old:selected;if(!get(sel.value)&&cfg.stations.length)sel.value=cfg.stations[0].id;loadPayload();}
+function loadPayload(){let s=get($('eventStation').value);$('payload').value=JSON.stringify(s?.payloads?.[$('eventType').value]||{},null,2);$('message').textContent=''}
+function download(name,data){let url=URL.createObjectURL(new Blob([JSON.stringify(data,null,2)],{type:'application/json'}));let a=document.createElement('a');a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),1200);}
+function clean(){return {allowIncompleteExit:cfg.allowIncompleteExit===true,speed:cfg.speed,feed:cfg.feed,spacing:cfg.spacing,entryPos:cfg.entryPos,exitPos:cfg.exitPos,direction:cfg.direction,beltLength:cfg.beltLength,beltWidth:cfg.beltWidth,exitDuration:cfg.exitDuration,exitCapacity:cfg.exitCapacity,interBuffer:cfg.interBuffer,route:cfg.route,noks:cfg.noks,images:cfg.images,stations:cfg.stations.map(({id,name,pos,type,capacity,duration,pick,put,robotCapacity,robotTime,processCapacity,beltBuffer,afterBuffer,group,failRate,payloads})=>({id,name,pos,type,capacity,duration,pick,put,robotCapacity,robotTime,processCapacity,beltBuffer,afterBuffer,group,failRate,payloads}))}}
+function add(type){if(cfg.stations.length>=16)return alert('Maxim 16 stații');let n=1;while(get('ST'+String(n).padStart(2,'0')))n++;let s={id:'ST'+String(n).padStart(2,'0'),name:type==='robot'?'Robot '+n:'Proces '+n,pos:clamp(.1+.8*(cfg.stations.length+1)/17,.02,.98),type,capacity:3,duration:4,pick:1,put:1,robotCapacity:1,robotTime:2,processCapacity:1,beltBuffer:4,afterBuffer:4,group:'',failRate:0,payloads:clone(defaultPayload)};cfg.stations.push(s);selected=s.id;changeStructure();}
+$('addProcess').onclick=()=>add('process');$('addRobot').onclick=()=>add('robot');
+$('eventStation').onchange=loadPayload;$('eventType').onchange=loadPayload;
+$('applyPayload').onclick=()=>{try{let obj=JSON.parse($('payload').value);if(!obj||typeof obj!=='object'||Array.isArray(obj))throw Error('Trebuie obiect JSON');let s=get($('eventStation').value);if(!s)throw Error('Selectează o stație');s.payloads[$('eventType').value]=obj;$('message').textContent='✓ Datele au fost aplicate.'}catch(e){$('message').textContent='Eroare: '+e.message}};
+$('preview').onclick=()=>{try{let obj=JSON.parse($('payload').value);alert(JSON.stringify(template(obj,{pieceId:'P0042',stationId:$('eventStation').value,stationName:get($('eventStation').value)?.name,event:$('eventType').value,time:round(clock),timestamp:new Date().toISOString(),cycle:0}),null,2))}catch(e){alert(e.message)}};
+$('entryPos').onchange=e=>{cfg.entryPos=clamp((+e.target.value||0)/100,0,.999);changeStructure();syncPorts()};$('exitPos').onchange=e=>{cfg.exitPos=clamp((+e.target.value||0)/100,0,.999);changeStructure();syncPorts()};$('direction').addEventListener('change',e=>{cfg.direction=e.target.value==='-1'?-1:1;changeStructure();syncPorts();});
+$('clockwise').onclick=()=>{$('direction').value='1';$('direction').dispatchEvent(new Event('change'))};$('counterclockwise').onclick=()=>{$('direction').value='-1';$('direction').dispatchEvent(new Event('change'))};
+$('beltLength').oninput=e=>{cfg.beltLength=+e.target.value;updateGeometry();draw()};$('beltLength').onchange=()=>changeStructure();$('beltWidth').onchange=e=>{cfg.beltWidth=clamp(+e.target.value||55,24,80);changeStructure()};
+$('speed').oninput=e=>{cfg.speed=+e.target.value;$('speedLabel').textContent=cfg.speed.toFixed(1)+'×'};
+$('feed').onchange=e=>{cfg.feed=clamp(+e.target.value||3,.5,120);e.target.value=cfg.feed};
+$('interBuffer').onchange=e=>{cfg.interBuffer=clamp(Math.floor(+e.target.value||0),0,500);e.target.value=cfg.interBuffer};$('exitDuration').onchange=e=>{cfg.exitDuration=clamp(+e.target.value||8,.1,3600);e.target.value=cfg.exitDuration};$('exitCapacity').onchange=e=>{cfg.exitCapacity=clamp(Math.floor(+e.target.value||1),1,20);e.target.value=cfg.exitCapacity};
+$('spacing').onchange=e=>{cfg.spacing=clamp(+e.target.value||35,15,100);e.target.value=cfg.spacing};
+$('toggle').onclick=()=>{advanceTime(performance.now());running=!running;last=performance.now();$('toggle').textContent=running?'⏸ Pauză':'▶ Continuă'};
+$('reset').onclick=reset;$('clearLog').onclick=()=>{events=[];pendingLogs=[];$('log').replaceChildren();draw()};
+$('save').onclick=()=>{try{localStorage.setItem('sim_v19',JSON.stringify(clean()));$('message').textContent='✓ Configurație salvată în browser'}catch(e){$('message').textContent='Salvarea nu este disponibilă: '+e.message}};
+$('exportCfg').onclick=()=>download('configuratie-linie.json',clean());$('exportEvents').onclick=()=>download('evenimente-simulate.json',events);
+$('importCfg').onclick=()=>$('importFile').click();$('importFile').onchange=async e=>{let file=e.target.files[0];if(!file)return;try{cfg=normalize(JSON.parse(await file.text()));selected=cfg.stations[0]?.id||'';changeStructure();syncPorts();$('interBuffer').value=cfg.interBuffer;$('exitDuration').value=cfg.exitDuration;$('exitCapacity').value=cfg.exitCapacity;$('speed').value=cfg.speed;$('speedLabel').textContent=cfg.speed.toFixed(1)+'×';$('feed').value=cfg.feed;$('spacing').value=cfg.spacing;$('message').textContent='✓ Configurație importată'}catch(err){alert('Import invalid: '+err.message)}e.target.value=''};
+function nearest(x,y){let best=0,dist=Infinity;for(let i=0;i<=600;i++){let f=i/600,p=point(f),d=(p.x-x)**2+(p.y-y)**2;if(d<dist){dist=d;best=f}}return clamp(best,0,.999)}
+function coords(e){let pt=$('stage').createSVGPoint();pt.x=e.clientX;pt.y=e.clientY;return pt.matrixTransform($('stage').getScreenCTM().inverse())}
+$('stage').addEventListener('pointerdown',e=>{let port=e.target.closest('[data-port]'),node=e.target.closest('[data-id]'),nok=e.target.closest('[data-nok]'),im=e.target.closest('[data-image]');if(!port&&!node&&!nok&&!im)return;if(nok){drag={nok:nok.dataset.nok}}else if(im){drag={image:im.dataset.image}}else if(port){drag={port:port.dataset.port};}else{selected=node.dataset.id;drag={id:selected,start:coords(e)};}$('stage').setPointerCapture(e.pointerId);renderEditor();});
+$('stage').addEventListener('pointermove',e=>{if(!drag)return;let c=coords(e),pos=nearest(c.x,c.y);if(drag.nok){let n=cfg.noks.find(x=>x.id===drag.nok);if(n)n.pos=pos}else if(drag.image){let im=cfg.images.find(x=>x.id===drag.image);if(im){im.station='';im.x=c.x;im.y=c.y}}else if(drag.port){cfg[drag.port==='entry'?'entryPos':'exitPos']=pos;syncPorts()}else{let st=get(drag.id);if(!st)return;st.pos=pos}draw();});
+$('stage').addEventListener('pointerup',e=>{if(!drag)return;drag=null;changeStructure()});
+$('stage').addEventListener('pointercancel',()=>{drag=null;changeStructure()});
+runtime();updateGeometry();syncPorts();$('interBuffer').value=cfg.interBuffer;$('exitDuration').value=cfg.exitDuration;$('exitCapacity').value=cfg.exitCapacity;$('speed').value=cfg.speed;$('speedLabel').textContent=cfg.speed.toFixed(1)+'×';$('feed').value=cfg.feed;$('spacing').value=cfg.spacing;renderEditor();renderSelect();renderAdvanced();draw();
+function advanceTime(now){
+  if(running)accumulator+=Math.max(0,(now-last)/1000);
+  last=now;
+}
+function pump(){
+  advanceTime(performance.now());
+  const started=performance.now();
+  let ticks=0;
+  while(running&&accumulator+1e-9>=STEP_SECONDS&&ticks<10000){
+    step(STEP_SECONDS);accumulator=Math.max(0,accumulator-STEP_SECONDS);ticks++;
+    if(performance.now()-started>=12)break;
+  }
+  setTimeout(pump,25);
+}
+let lastDraw=0;
+function frame(t){if(running&&t-lastDraw>=100){draw();lastDraw=t;}requestAnimationFrame(frame)}
+setTimeout(pump,25);requestAnimationFrame(frame);
+})();
+</script>
+<script id="languageAndTheme">
+(()=>{
+'use strict';
+const translations={"Simulator linie de producție": "Production Line Simulator", "Bandă continuă · stații mutabile · robot handling · proces lângă bandă · evenimente locale": "Continuous conveyor · movable stations · handling robots · off-belt processes · local events", "Pauză": "Pause", "Continuă": "Resume", "Reset simulare": "Reset simulation", "Salvează configurația": "Save configuration", "Export configurație": "Export configuration", "Import configurație": "Import configuration", "Linia de producție": "Production line", "Trage cercul colorat al unei stații pe banda ovală pentru a o muta. Click pe stație pentru configurare. Robotul (R) deservește un proces separat (P).": "Drag a station's colored circle along the oval conveyor to reposition it. Click a station to configure it. Robot (R) serves a separate process (P).", "INTRARE": "INPUT", "IEȘIRE": "OUTPUT", "BANDĂ CONTINUĂ": "CONTINUOUS CONVEYOR", "↻ sens orar · piese în mișcare": "↻ clockwise · moving parts", "Albastru: bandă": "Blue: conveyor", "Galben: buffer": "Yellow: buffer", "Verde: procesare": "Green: processing", "Roz: repunere": "Pink: return", "Finalizate": "Completed", "Pe bandă": "On conveyor", "În stații": "At stations", "Evenimente": "Events", "Piese NOK": "Rejected parts", "Parametri globali": "Global settings", "Viteză bandă": "Conveyor speed", "Alimentare (s)": "Feed interval (s)", "Distanță minimă (px)": "Minimum spacing (px)", "O tură durează 45 secunde la 1×. Dacă un buffer este plin, piesa așteaptă fără a depăși stația. Modificările de structură resetează simularea pentru consistență.": "One lap takes 45 seconds at 1×. When a buffer is full, a part makes another lap. Structural changes reset the simulation for consistency.", "Forma benzii": "Conveyor shape", "Lungime porțiune dreaptă": "Straight section length", "Lățime bandă (px)": "Conveyor width (px)", "Schimbă cât de alungită este banda ovală. Stațiile, intrarea și ieșirea rămân atașate traseului. Modificarea geometriei resetează piesele curente.": "Adjust the oval conveyor's length. Stations, input and output stay attached to the track. Changing geometry resets current parts.", "Jurnal JSON (fără transmitere reală)": "JSON event log (no actual transmission)", "Export JSON": "Export JSON", "Șterge": "Delete", "Șterge NOK": "Delete NOK", "Stații și roboți": "Stations and robots", "+ Proces": "+ Process", "+ Robot + proces": "+ Robot + process", "Poziția este procent din traseul benzii. Poți muta stațiile cu mouse-ul sau prin câmpul Poziție. Ordinea proceselor este ordinea fizică pe bandă.": "Position is a percentage of the conveyor path. Move stations by dragging or editing Position. Processing order is configured separately.", "Rutare / ordine logică": "Routing / processing sequence", "Secvența este generată automat după poziția stațiilor, de la START la IEȘIRE, în sensul benzii. Stațiile cu același grup rămân alternative. Exemplu:": "Enter stage IDs separated by commas. Stations sharing a group are parallel alternatives. Example:", "Grupul poate avea maximum 8 stații.": "A group can have up to 8 stations.", "Secvență de procesare": "Processing sequence", "Aplică ruta": "Apply route", "Poziții NOK": "NOK positions", "+ Poziție NOK": "+ NOK position", "Imagini de prezentare": "Presentation images", "Adaugă imagini peste linie sau stații, ori imagini pentru piesă în funcție de etapa parcursă. Sunt păstrate în configurația exportată. Fișierele mari pot depăși limita de localStorage.": "Add images over the conveyor or stations, or part images by processing stage. Images are included in exported configurations. Large files may exceed local storage limits.", "Titlu imagine": "Image title", "Tip imagine": "Image type", "Peste linie / stație": "Over conveyor / station", "Pe produs": "On product", "Stație / etapă": "Station / stage", "Dimensiune (px)": "Size (px)", "Alege imagine": "Choose image", "Adaugă imagine": "Add image", "Evenimente configurabile": "Configurable events", "Stație": "Station", "Momentul evenimentului": "Event trigger", "Sosire la stație": "Arrived at station", "Ridicare finalizată": "Pickup completed", "Proces început": "Process started", "Proces finalizat": "Process completed", "Repunere pe bandă": "Returned to conveyor", "JSON suplimentar": "Additional JSON", "Variabile:": "Variables:", "Aplică JSON": "Apply JSON", "Previzualizare": "Preview", "Poți muta INTRARE și IEȘIRE direct pe traseu.": "You can move INPUT and OUTPUT directly on the track.", "Poziție intrare (%)": "Input position (%)", "Poziție ieșire (%)": "Output position (%)", "Sens bandă": "Conveyor direction", "Orar ↻": "Clockwise ↻", "Antiorar ↺": "Counterclockwise ↺", "↻ Orar": "↻ Clockwise", "↺ Antiorar": "↺ Counterclockwise", "Selectează": "Select", "Proces local": "Local process", "Robot + proces": "Robot + process", "Proces": "Process", "Montare robotizată": "Robotic assembly", "Înșurubare": "Screwing", "Testare": "Testing", "Buffer:": "Buffer:", "Active:": "Active:", "Nume": "Name", "Poziție pe bandă (%)": "Conveyor position (%)", "Capacitate totală (piese)": "Total capacity (parts)", "Durată proces (s)": "Process duration (s)", "Procese paralele": "Parallel processing slots", "Grup alternativ (ex. GRUP_A)": "Alternative group (e.g. GROUP_A)", "Rată FAIL (%)": "FAIL rate (%)", "Transport robot / sens (s)": "Robot travel / direction (s)", "Capacitate robot (operații simultane)": "Robot capacity (simultaneous operations)", "Prindere piesă (s)": "Part gripping (s)", "Depunere piesă (s)": "Part placement (s)", "Ridicare (s)": "Pickup (s)", "Repunere (s)": "Return (s)", "Robotul transferă piesa către procesul P, așteaptă un loc liber și o aduce înapoi. Capacitatea totală include toate etapele.": "The robot transfers the part to process P, waits for an available slot, and brings it back. Total capacity includes all stages.", "Procesul este lângă bandă. Piesele intră în buffer FIFO.": "The process is next to the conveyor. Parts enter a FIFO buffer.", "Linie / fără stație": "Conveyor / no station", "piesă": "part", "suprapunere": "overlay", "✓ Rută aplicată": "✓ Route applied", "Etapă necunoscută:": "Unknown stage:", "Maximum 8 stații per grup": "Maximum 8 stations per group", "✓ Datele au fost aplicate.": "✓ Data applied.", "Eroare:": "Error:", "✓ Configurație salvată în browser": "✓ Configuration saved in browser", "Salvarea nu este disponibilă:": "Saving is unavailable:", "✓ Configurație importată": "✓ Configuration imported", "Imagine prea mare. Folosește sub 1.2 MB": "Image too large. Use under 1.2 MB", "Selectează o imagine": "Choose an image", "Ștergi ": "Delete ", "? Simularea se va reseta.": "? The simulation will reset.", "Aspect:": "Appearance:", "Limbă:": "Language:", "Semafor buffer local": "Local buffer signal", "ROȘU · BUFFER LOCAL": "RED · LOCAL BUFFER", "VERDE · RUN": "GREEN · RUN", "Există doar buffer BEFORE la fiecare stație. Piesele finalizate rămân în capacitatea stației precedente până la transfer. Când bufferul local este plin, blocajul se propagă în amonte, inclusiv spre stația precedentă. Segmentele din aval continuă să funcționeze. Alimentarea continuă cât timp există spațiu la INTRARE. ROȘU indică un buffer local saturat, nu oprirea întregii benzi.": "If a station is busy, parts accumulate physically on the conveyor upstream. A full local buffer propagates backpressure to the preceding station, while downstream stations keep running. Feeding continues while INPUT has room. RED indicates local saturation, not a global conveyor stop.", "Orar": "Clockwise", "Antiorar": "Counterclockwise"};
+translations['Buffer ieșire: maximum 1.000 de piese în așteptare. Piesele suplimentare rămân pe bandă până apare loc.']='Exit buffer: up to 1,000 waiting parts. Additional parts remain on the conveyor until space is available.';
+Object.assign(translations,{'PORNIT':'RUNNING','OPRIT':'STOPPED','PROCES':'PROCESS'});
+Object.assign(translations,{'Permite evacuarea pieselor incomplete':'Allow unloading incomplete parts','Incomplete evacuate':'Incomplete unloaded'});
+const entries=Object.entries(translations).sort((a,b)=>b[0].length-a[0].length);
+let lang='ro',theme='black';
+try{lang=localStorage.getItem('sim_ui_lang')==='en'?'en':'ro';theme=['black','white','grey'].includes(localStorage.getItem('sim_ui_theme'))?localStorage.getItem('sim_ui_theme'):'black'}catch{}
+const original=new WeakMap();
+const ignoreParent=(el)=>!!el?.closest('#helpDialog, #log, #payload, #editor input, #imageEditor input, #nokEditor input, script, style');
+function translate(value){let out=value;for(const [ro,en] of entries){if(out.includes(ro))out=out.split(ro).join(en)}return out}
+function walk(){
+const walker=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT);
+let node;while((node=walker.nextNode())){
+if(!node.parentElement||ignoreParent(node.parentElement))continue;
+const text=node.nodeValue;
+if(!text.trim())continue;
+let orig=original.get(node);
+if(orig===undefined){orig=text;original.set(node,orig)}
+else if(text!==orig&&text!==translate(orig)){orig=text;original.set(node,orig)}
+const next=lang==='en'?translate(orig):orig;
+if(node.nodeValue!==next)node.nodeValue=next;
+}
+for(const input of document.querySelectorAll('[placeholder]')){
+if(!input.dataset.roPlaceholder)input.dataset.roPlaceholder=input.getAttribute('placeholder');
+input.setAttribute('placeholder',lang==='en'?translate(input.dataset.roPlaceholder):input.dataset.roPlaceholder);
+}
+document.getElementById('helpRo').hidden=lang!=='ro';document.getElementById('helpEn').hidden=lang!=='en';document.getElementById('helpCloseLabel').textContent=lang==='ro'?'Închide':'Close';document.documentElement.lang=lang;
+document.title=lang==='en'?'Production Line Simulator v2.1':'Simulator linie de producție v2.1';
+}
+function refreshButtons(){
+document.body.dataset.theme=theme;
+for(const b of document.querySelectorAll('[data-view]')){b.classList.toggle('active',b.dataset.view===theme);b.setAttribute('aria-pressed',String(b.dataset.view===theme))}
+for(const b of document.querySelectorAll('[data-lang]')){b.classList.toggle('active',b.dataset.lang===lang);b.setAttribute('aria-pressed',String(b.dataset.lang===lang))}
+}
+const helpDialog=document.getElementById('helpDialog');
+document.getElementById('helpBtn').addEventListener('click',()=>{if(!helpDialog.open)helpDialog.showModal()});
+document.getElementById('helpClose').addEventListener('click',()=>helpDialog.close());
+helpDialog.addEventListener('click',e=>{if(e.target===helpDialog)helpDialog.close()});
+for(const b of document.querySelectorAll('[data-view]'))b.addEventListener('click',()=>{theme=b.dataset.view;try{localStorage.setItem('sim_ui_theme',theme)}catch{}refreshButtons()});
+for(const b of document.querySelectorAll('[data-lang]'))b.addEventListener('click',()=>{lang=b.dataset.lang;try{localStorage.setItem('sim_ui_lang',lang)}catch{}walk();refreshButtons()});
+let busy=false;
+const observer=new MutationObserver(()=>{if(busy||lang==='ro')return;busy=true;observer.disconnect();walk();observer.observe(document.body,{childList:true,subtree:true,characterData:true});busy=false});
+walk();refreshButtons();observer.observe(document.body,{childList:true,subtree:true,characterData:true});
+})();
+</script>
+</body></html>

@@ -60,7 +60,7 @@ body[data-theme="grey"] #helpDialog code,body[data-theme="grey"] #helpDialog .he
 <h3>1. Primii pași</h3>
 <ol><li>Deschide fișierul HTML în Chrome sau Edge.</li><li>Alege tema Black / White / Grey și limba RO / EN.</li><li>Setează forma benzii, intrarea, ieșirea și sensul de deplasare.</li><li>Adaugă stațiile și configurează timpii, capacitățile și ruta.</li><li>Apasă <b>Continuă</b> pentru rulare sau <b>Pauză</b> pentru oprire temporară.</li><li>Verifică piesele și jurnalul de evenimente JSON.</li></ol>
 <h3>2. Configurarea benzii</h3>
-<ul><li><b>Viteză bandă:</b> factorul de viteză; la 1× o tură de referință durează circa 45 s.</li><li><b>Alimentare (s):</b> intervalul de introducere a pieselor, dacă există loc liber.</li><li><b>Distanță minimă:</b> spațiul dintre piesele aflate pe bandă.</li><li><b>Lungime porțiune dreaptă:</b> alungește sau scurtează ovalul.</li><li><b>Lățime bandă:</b> modifică grosimea desenului.</li><li><b>Orar / Antiorar:</b> schimbă sensul de deplasare.</li><li><b>Intrare / Ieșire:</b> mută marcajele cu mouse-ul sau introdu poziția în procente.</li></ul>
+<ul><li><b>Formă bandă:</b> rotundă pentru circuit circular, ovală pentru buclă alungită sau dreaptă cu retur îngust și gol.</li><li><b>Lungime porțiune dreaptă:</b> reglează segmentul activ în forma ovală sau dreaptă.</li><li><b>Diametru:</b> reglează dimensiunea buclei rotunde sau ovalului.</li><li><b>Lățime bandă:</b> modifică grosimea desenului.</li><li><b>Orar / Antiorar:</b> schimbă sensul pentru buclele închise.</li><li><b>Intrare / Ieșire:</b> mută marcajele de pe traseu sau etichetele separat.</li><li><b>Semafor LINIE:</b> oprește/pornește toate operațiile, inclusiv alimentarea feederelor.</li></ul>
 <h3>3. Adăugarea și poziționarea stațiilor</h3>
 <p>Apasă <b>+ Proces</b> pentru o stație simplă sau <b>+ Robot + proces</b> pentru un robot care preia piesa și o transportă la un proces din afara benzii. Trage marcajul stației pe bandă; alternativ, editează poziția procentuală. Butonul <b>Șterge</b> elimină stația. Modificările structurale pot reseta piesele din simulare.</p>
 <h3>4. Parametrii unei stații</h3>
@@ -90,7 +90,7 @@ body[data-theme="grey"] #helpDialog code,body[data-theme="grey"] #helpDialog .he
 <h3>1. Getting started</h3>
 <ol><li>Open the HTML file in Chrome or Edge.</li><li>Choose Black / White / Grey view and RO / EN language.</li><li>Configure conveyor shape, input, output and direction.</li><li>Add stations and configure times, capacities and routing.</li><li>Use <b>Resume</b> to run or <b>Pause</b> to stop temporarily.</li><li>Monitor parts and the JSON event log.</li></ol>
 <h3>2. Conveyor settings</h3>
-<ul><li><b>Conveyor speed:</b> speed multiplier; at 1× a reference lap takes approximately 45 s.</li><li><b>Feed interval (s):</b> time between inserted parts when space is available.</li><li><b>Minimum spacing:</b> gap between parts on the belt.</li><li><b>Straight section length:</b> makes the oval shorter or longer.</li><li><b>Conveyor width:</b> changes the visual thickness.</li><li><b>Clockwise / Counterclockwise:</b> changes travel direction.</li><li><b>Input / Output:</b> drag the markers or set their percentage positions.</li></ul>
+<ul><li><b>Belt layout:</b> round loop, oval loop or straight active run with a narrow empty return.</li><li><b>Straight section length:</b> sets the active straight run for oval and straight layouts.</li><li><b>Diameter:</b> sets the height of the round loop or oval.</li><li><b>Conveyor width:</b> changes the visual thickness.</li><li><b>Clockwise / Counterclockwise:</b> changes direction on closed loops.</li><li><b>Input / Output:</b> drag the markers or move their labels separately.</li><li><b>LINE semaphore:</b> stops or starts all operations, including material feeders.</li></ul>
 <h3>3. Adding and moving stations</h3>
 <p>Click <b>+ Process</b> for a simple station or <b>+ Robot + process</b> for a robot that picks up a part and transfers it to an off-belt process. Drag a station marker on the conveyor or enter its position percentage. <b>Delete</b> removes a station. Structural edits may reset parts in the current simulation.</p>
 <h3>4. Station parameters</h3>
@@ -119,8 +119,9 @@ body[data-theme="grey"] #helpDialog code,body[data-theme="grey"] #helpDialog .he
 <svg id="stage" viewBox="0 0 960 570" aria-label="Bandă ovală interactivă">
 <path id="track" d="M200 145 H760 A135 135 0 0 1 760 415 H200 A135 135 0 0 1 200 145 Z" fill="none" stroke="#40536d" stroke-width="55"/>
 <path id="trackDashes" d="M200 145 H760 A135 135 0 0 1 760 415 H200 A135 135 0 0 1 200 145 Z" fill="none" stroke="#b4c3d6" stroke-width="2" stroke-dasharray="12 14" opacity=".55"/>
+<g id="returnSvg"></g>
 <g id="trafficSvg"></g><g id="stationsSvg"></g><g id="partsSvg"></g><g id="overlaysSvg"></g><g id="portsSvg"></g>
-<text x="480" y="261" fill="#e5efff" text-anchor="middle" font-size="24" font-weight="700">BANDĂ CONTINUĂ</text><text x="480" y="290" fill="#9ab2d0" text-anchor="middle" font-size="15">↻ sens orar · piese în mișcare</text>
+<text id="beltTitle" x="480" y="261" fill="#e5efff" text-anchor="middle" font-size="24" font-weight="700">BANDĂ CONTINUĂ</text><text id="beltDirection" x="480" y="290" fill="#9ab2d0" text-anchor="middle" font-size="15">↻ sens orar · piese în mișcare</text>
 </svg>
 <div class="actions"><span class="tag">Albastru: bandă</span><span class="tag">Galben: buffer</span><span class="tag">Verde: procesare</span><span class="tag">Roz: repunere</span></div></section>
 <section class="panel"><div class="stats"><div class="stat"><b id="done">0</b><small>Finalizate</small></div><div class="stat"><b id="beltCount">0</b><small>Pe bandă</small></div><div class="stat"><b id="offCount">0</b><small>În stații</small></div><div class="stat"><b id="eventCount">0</b><small>Evenimente</small></div><div class="stat"><b id="nokCount">0</b><small>Piese NOK</small></div><div class="stat"><b id="exitBufferCount">0</b><small>Buffer ieșire</small></div></div></section>
@@ -140,10 +141,50 @@ const defaults={speed:1,feed:3,spacing:35,entryPos:0,exitPos:.9,direction:1,belt
 const clone=x=>JSON.parse(JSON.stringify(x)),clamp=(v,a,b)=>Number.isFinite(v)?Math.min(b,Math.max(a,v)):a,round=x=>Math.round(x*100)/100;
 function normalize(raw){if(!raw||!Array.isArray(raw.stations))throw Error('Configurație invalidă');let ids=new Set();let stations=raw.stations.slice(0,16).map((s,i)=>{let id=String(s.id||'ST'+(i+1));if(ids.has(id))id+='_'+i;ids.add(id);return {id,name:String(s.name||'Proces').slice(0,45),pos:clamp(Number(s.pos)||.1,.02,.98),type:s.type==='robot'?'robot':'process',capacity:clamp(Math.floor(Number(s.capacity)||3),1,40),duration:clamp(Number(s.duration)||4,.1,600),pick:clamp(Number(s.pick)||1,.1,120),put:clamp(Number(s.put)||1,.1,120),robotCapacity:clamp(Math.floor(Number(s.robotCapacity)||1),1,10),robotTime:clamp(Number(s.robotTime)||1,.1,120),processCapacity:clamp(Math.floor(Number(s.processCapacity)||1),1,10),beltBuffer:clamp(Math.floor(Number(s.beltBuffer??raw.interBuffer??4)),0,500),afterBuffer:clamp(Math.floor(Number(s.afterBuffer??4)),0,500),group:String(s.group||'').trim().slice(0,32),failRate:clamp(Number(s.failRate??0),0,100),payloads:s.payloads&&typeof s.payloads==='object'?s.payloads:clone(defaultPayload)}});return {allowIncompleteExit:raw.allowIncompleteExit===true,speed:clamp(Number(raw.speed)||1,.2,4),feed:clamp(Number(raw.feed)||3,.5,120),spacing:clamp(Number(raw.spacing)||35,15,100),entryPos:clamp(Number(raw.entryPos??0),0,.999),exitPos:clamp(Number(raw.exitPos??.9),0,.999),direction:Number(raw.direction)===-1?-1:1,beltLength:clamp(Number(raw.beltLength??560),80,560),beltWidth:clamp(Number(raw.beltWidth??55),24,80),exitDuration:clamp(Number(raw.exitDuration??8),.1,3600),exitCapacity:clamp(Math.floor(Number(raw.exitCapacity??1)),1,20),interBuffer:clamp(Math.floor(Number(raw.interBuffer??4)),0,500),route:Array.isArray(raw.route)?raw.route.map(String):stations.map(x=>x.id),noks:Array.isArray(raw.noks)?raw.noks.slice(0,30).map(n=>({id:String(n.id),name:String(n.name||'NOK'),pos:clamp(Number(n.pos)||0,0,.999)})):[],images:Array.isArray(raw.images)?raw.images.slice(0,40).filter(x=>typeof x.src==='string'&&x.src.startsWith('data:image/')).map(x=>({id:String(x.id),title:String(x.title||''),kind:x.kind==='product'?'product':'overlay',station:String(x.station||''),size:clamp(Number(x.size)||70,20,180),x:Number(x.x)||480,y:Number(x.y)||280,src:x.src})):[],stations};}
 let cfg;try{cfg=normalize(JSON.parse(localStorage.getItem('sim_v26')||localStorage.getItem('sim_v19')||localStorage.getItem('sim_v18')||localStorage.getItem('sim_v13')||localStorage.getItem('sim_v03')))}catch{cfg=normalize(defaults)}
-let trafficRed=false,trafficReason='',pieces=[],events=[],pendingLogs=[],exitQueue=[],exitJobs=[],exitBlocked=[],seq=0,finished=0,incompleteUnloaded=0,nokCount=0,eventTotal=0,clock=0,feedClock=0,running=true,last=performance.now(),accumulator=0,selected=cfg.stations[0]?.id||'',drag=null;
+let trafficRed=false,trafficReason='',pieces=[],wpcs=[],events=[],pendingLogs=[],exitQueue=[],exitJobs=[],exitBlocked=[],seq=0,wpcSequence=0,finished=0,incompleteUnloaded=0,nokCount=0,eventTotal=0,clock=0,feedClock=0,running=true,last=performance.now(),accumulator=0,selected=cfg.stations[0]?.id||'',drag=null;
 const STEP_SECONDS=.05,MAX_EXIT_WAITING=1000,MAX_EXIT_BLOCKED=1000;
 let entryEnabled=true,exitEnabled=true;
+let mapWidth=960,mapCenterX=480;
 const mod=x=>(x%1+1)%1,virtual=pos=>mod((pos-cfg.entryPos)*cfg.direction),world=pos=>mod(cfg.entryPos+cfg.direction*pos),ordered=()=>[...cfg.stations].sort((a,b)=>virtual(a.pos)-virtual(b.pos)),get=id=>cfg.stations.find(s=>s.id===id);
+function resetWpcs(){
+  wpcs=[];
+  if(!cfg.wpcEnabled)return;
+  const count=clamp(Math.floor(Number(cfg.wpcCount)||8),1,50);
+  for(let index=0;index<count;index++)wpcs.push({id:'WPC'+String(++wpcSequence).padStart(3,'0'),pos:index/count,pieceId:null});
+}
+function syncWpcBindings(){
+  for(const wpc of wpcs){
+    const piece=pieces.find(item=>item.wpcId===wpc.id);
+    if(piece){wpc.pieceId=piece.id;wpc.pos=piece.pos}else wpc.pieceId=null;
+  }
+}
+function releaseWorkpiece(piece){
+  if(!piece?.wpcId)return;
+  const wpcId=piece.wpcId,wpc=wpcs.find(item=>item.id===wpcId);
+  if(wpc)wpc.pieceId=null;
+  delete piece.wpcId;
+  emit('wpc_emptied',piece,null,{wpc_id:wpcId});
+}
+function advanceEmptyWpcs(speed,gap){
+  if(!cfg.wpcEnabled)return;
+  syncWpcBindings();
+  const moving=wpcs.filter(wpc=>!wpc.pieceId);
+  for(const wpc of moving){
+    let ahead=Infinity;
+    for(const other of wpcs){
+      if(other===wpc)continue;
+      const distance=mod(other.pos-wpc.pos);
+      if(distance>1e-8)ahead=Math.min(ahead,distance);
+    }
+    for(const piece of pieces){
+      if(piece.mode!=='belt'||piece.wpcId)continue;
+      const distance=mod(piece.pos-wpc.pos);
+      if(distance>1e-8)ahead=Math.min(ahead,distance);
+    }
+    const distance=Math.min(speed,ahead===Infinity?speed:Math.max(0,ahead-gap));
+    wpc.pos=mod(wpc.pos+distance);
+  }
+}
 // Ruta este intotdeauna ordinea fizica START -> IESIRE, in sensul benzii.
 // Grupele alternative raman o singura etapa la pozitia primei statii din grup.
 function processingOrder(){
@@ -178,7 +219,7 @@ function setOperationEnabled(target,enabled){
   else return;
   emit(enabled?'operation_started':'operation_stopped',null,station,{operation:target});
 }
-function reset(){pieces=[];events=[];pendingLogs=[];exitQueue=[];exitJobs=[];exitBlocked=[];seq=finished=incompleteUnloaded=nokCount=eventTotal=clock=feedClock=accumulator=0;last=performance.now();trafficRed=false;trafficReason='';$('log').replaceChildren();runtime();draw();}
+function reset(){pieces=[];events=[];pendingLogs=[];exitQueue=[];exitJobs=[];exitBlocked=[];seq=finished=incompleteUnloaded=nokCount=eventTotal=clock=feedClock=accumulator=0;last=performance.now();trafficRed=false;trafficReason='';$('log').replaceChildren();runtime();resetWpcs();draw();}
 function template(v,ctx){if(typeof v==='string')return v.replace(/\{\{(\w+)\}\}/g,(_,k)=>String(ctx[k]??''));if(Array.isArray(v))return v.map(x=>template(x,ctx));if(v&&typeof v==='object')return Object.fromEntries(Object.entries(v).map(([k,x])=>[k,template(x,ctx)]));return v}
 function emit(type,p,s,extra={}){let ctx={pieceId:p?.id||'',stationId:s?.id||'',stationName:s?.name||'',event:type,time:round(clock),timestamp:new Date().toISOString(),cycle:p?.cycles||0};let data=template(s?.payloads?.[type]||{},ctx);let evt={event:type,time_s:round(clock),piece_id:p?.id||null,station_id:s?.id||null,station_name:s?.name||null,...extra,custom:data};eventTotal++;events.push(evt);if(events.length>5000)events.shift();pendingLogs.push(evt);if(pendingLogs.length>130)pendingLogs.shift();}
 function flushLogs(){for(const evt of pendingLogs){let div=document.createElement('div');div.className='entry';div.textContent=JSON.stringify(evt);$('log').prepend(div);}pendingLogs=[];while($('log').children.length>130)$('log').lastChild.remove();}
@@ -208,7 +249,9 @@ function processJobs(s,dt){
   }
   const source=s.pending;
   while(s.jobs.length<s.processCapacity && source.length){
-    const p=source.shift();
+    const p=source[0];
+    if(p.materialRequired===true&&p.materialReady!==true)break;
+    source.shift();
     s.jobs.push({p,left:s.duration});emit('process_started',p,s);
   }
 }
@@ -289,7 +332,7 @@ clock+=dt;if(entryEnabled)feedClock+=dt;const gap=cfg.spacing/L,order=ordered(),
 if(exitEnabled){
 if(cfg.allowIncompleteExit){
   while(exitBlocked.length&&exitQueue.length<MAX_EXIT_WAITING){
-    const part=exitBlocked.shift();part.mode='exit';part.incomplete=true;part.remainingStages=cfg.route.slice(part.next);
+    const part=exitBlocked.shift();releaseWorkpiece(part);part.mode='exit';part.incomplete=true;part.remainingStages=cfg.route.slice(part.next);
     delete part.reservedFor;exitQueue.push(part);
     emit('incomplete_piece_entered_exit_buffer',part,null,{remaining_stages:part.remainingStages});
   }
@@ -329,16 +372,18 @@ drainAfter();
 // Move from downstream to upstream so each piece respects the UPDATED position
 // of the piece in front. A blocked station creates a physical accumulation,
 // without freezing downstream conveyor sections or their processes.
+advanceEmptyWpcs(speed,gap);
 const belt=pieces.filter(p=>p.mode==='belt').sort((a,b)=>b.pos-a.pos);
 // redStations derived from deterministic buffers
 for(let beltIndex=0;beltIndex<belt.length;beltIndex++){
 const p=belt[beltIndex];
 const start=p.pos;
 let ahead=Infinity;for(let offset=1;offset<belt.length;offset++){const front=belt[(beltIndex-offset+belt.length)%belt.length];if(front.mode!=='belt')continue;const separation=mod(front.pos-start);if(separation>eps){ahead=separation;break;}}
+if(cfg.wpcEnabled){for(const wpc of wpcs){if(wpc.id===p.wpcId)continue;const carried=pieces.find(item=>item.wpcId===wpc.id);if(carried?.mode==='belt')continue;const separation=mod(wpc.pos-start);if(separation>eps)ahead=Math.min(ahead,separation);}}
 let distance=Math.min(speed,ahead===undefined?speed:Math.max(0,ahead-gap));
 const endpoint=virtual(cfg.exitPos),exitDist=mod(endpoint-start);
-if(p.failed){let target=p.nokTarget?virtual(p.nokTarget.pos):endpoint,dist=mod(target-start);if(dist<=distance+eps){if(!p.nokTarget&&!exitEnabled){p.pos=endpoint;continue;}p.mode='done';nokCount++;emit('piece_rejected',p,null,{nok_id:p.nokTarget?.id||null});continue}}
-else if(p.next>=cfg.route.length){if(exitDist<=distance+eps){if(!exitEnabled||exitQueue.length>=MAX_EXIT_WAITING){p.pos=endpoint;continue;}p.mode='exit';exitQueue.push(p);emit('piece_entered_exit_buffer',p,null,{exit_buffer_size:exitQueue.length});continue}}
+if(p.failed){let target=p.nokTarget?virtual(p.nokTarget.pos):endpoint,dist=mod(target-start);if(dist<=distance+eps){if(!p.nokTarget&&!exitEnabled){p.pos=endpoint;continue;}releaseWorkpiece(p);p.mode='done';nokCount++;emit('piece_rejected',p,null,{nok_id:p.nokTarget?.id||null});continue}}
+else if(p.next>=cfg.route.length){if(exitDist<=distance+eps){if(!exitEnabled||exitQueue.length>=MAX_EXIT_WAITING){p.pos=endpoint;continue;}releaseWorkpiece(p);p.mode='exit';exitQueue.push(p);emit('piece_entered_exit_buffer',p,null,{exit_buffer_size:exitQueue.length});continue}}
 else{
 let candidates=p.reservedFor?cfg.stations.filter(st=>st.id===p.reservedFor):(chooseStation(p)||[]);
 if(!p.reservedFor&&candidates.some(st=>st.enabled!==false))candidates=candidates.filter(st=>st.enabled!==false);
@@ -366,7 +411,7 @@ if(blocked){
 }else if(exitDist<=distance+eps){
   if(!exitEnabled||(cfg.allowIncompleteExit?exitQueue.length>=MAX_EXIT_WAITING:exitBlocked.length>=MAX_EXIT_BLOCKED)){p.pos=endpoint;continue;}
   if(cfg.allowIncompleteExit){
-    p.mode='exit';p.incomplete=true;p.remainingStages=cfg.route.slice(p.next);delete p.reservedFor;exitQueue.push(p);
+    releaseWorkpiece(p);p.mode='exit';p.incomplete=true;p.remainingStages=cfg.route.slice(p.next);delete p.reservedFor;exitQueue.push(p);
     emit('incomplete_piece_entered_exit_buffer',p,null,{remaining_stages:p.remainingStages});
     continue;
   }
@@ -388,9 +433,11 @@ let previousRed=trafficRed;trafficRed=redStations.size>0||feederBlocked;
 trafficReason=[...(feederBlocked?['FEEDER']:[]),...redStations].join(', ');
 if(previousRed!==trafficRed)emit(trafficRed?'upstream_station_blocked':'upstream_station_unblocked',null,null,{stations:trafficReason});
 // Feed remains enabled as long as there is physical room at INPUT.
-if(entryEnabled&&feedClock+1e-9>=cfg.feed&&!feederBlocked&&exitBlocked.length<MAX_EXIT_BLOCKED&&freeAt(0,gap)){feedClock=Math.max(0,feedClock-cfg.feed);let p={id:'P'+String(++seq).padStart(4,'0'),pos:0,mode:'belt',next:0,cycles:0,failed:false,nokTarget:null,stageImages:[]};pieces.push(p);emit('piece_loaded',p,null)}
+const inputWpc=cfg.wpcEnabled?wpcs.find(wpc=>!wpc.pieceId&&wpc.pos<=speed+eps):null;
+if(entryEnabled&&feedClock+1e-9>=cfg.feed&&!feederBlocked&&exitBlocked.length<MAX_EXIT_BLOCKED&&(!cfg.wpcEnabled||inputWpc)&&freeAt(0,gap)){feedClock=Math.max(0,feedClock-cfg.feed);let p={id:'P'+String(++seq).padStart(4,'0'),pos:inputWpc?.pos||0,mode:'belt',next:0,cycles:0,failed:false,nokTarget:null,stageImages:[]};if(inputWpc){p.wpcId=inputWpc.id;inputWpc.pieceId=p.id;}pieces.push(p);emit('piece_loaded',p,null,inputWpc?{wpc_id:inputWpc.id}:{})}
 feedClock=Math.min(feedClock,cfg.feed);
 pieces=pieces.filter(p=>p.mode==='belt'||p.mode==='off');
+syncWpcBindings();
 }
 function el(tag,attrs={},text){let n=document.createElementNS(svgNS,tag);for(let [k,v] of Object.entries(attrs))n.setAttribute(k,v);if(text!==undefined)n.textContent=text;return n}
 function point(pos){return track.getPointAtLength(pos*L)}
@@ -439,13 +486,27 @@ function renderOperationControls(){
   }
 }
 function draw(){renderOperationControls();flushLogs();let g=$('stationsSvg'),pg=$('partsSvg');g.replaceChildren();pg.replaceChildren();
-let light=$('trafficSvg');light.replaceChildren();light.append(el('rect',{x:10,y:200,width:118,height:65,rx:10,fill:'#152337',stroke:trafficRed?'#ff5555':'#36d88c','stroke-width':3}));light.append(el('circle',{cx:34,cy:223,r:12,fill:trafficRed?'#ff3333':'#452b31'}));light.append(el('circle',{cx:34,cy:248,r:12,fill:trafficRed?'#244634':'#25d77b'}));light.append(el('text',{x:54,y:229,fill:'#fff','font-size':12,'font-weight':700},trafficRed?'BUFFER':'RUN'));light.append(el('text',{x:54,y:249,fill:'#d1e0f3','font-size':10},trafficRed?'LOCAL FULL':'CONVEYOR'));$('trafficStatus').textContent=trafficRed?'ROȘU · BUFFER LOCAL':'VERDE · RUN';$('trafficStatus').style.color=trafficRed?'#ff5555':'#30d98b';$('waitingCount').textContent=cfg.stations.reduce((n,st)=>n+(st.beltWaitingCount||0),0);
+let light=$('trafficSvg');light.replaceChildren();
+const semaphoreX=clamp(Number(cfg.semaphorePosition?.x??10),0,mapWidth-132),semaphoreY=clamp(Number(cfg.semaphorePosition?.y??200),0,480),lineOff=cfg.lineEnabled===false;
+const semaphore=el('g',{'data-semaphore-panel':'true',style:'cursor:move'});
+semaphore.append(el('rect',{x:semaphoreX,y:semaphoreY,width:132,height:90,rx:10,fill:'#152337',stroke:lineOff?'#ff5555':trafficRed?'#ff5555':'#36d88c','stroke-width':3}));
+semaphore.append(el('circle',{cx:semaphoreX+24,cy:semaphoreY+23,r:12,fill:trafficRed||lineOff?'#ff3333':'#452b31'}));
+semaphore.append(el('circle',{cx:semaphoreX+24,cy:semaphoreY+49,r:12,fill:!trafficRed&&!lineOff?'#25d77b':'#244634'}));
+semaphore.append(el('text',{x:semaphoreX+44,y:semaphoreY+27,fill:'#fff','font-size':12,'font-weight':700},lineOff?'LINIE OPRITĂ':trafficRed?'BUFFER':'RUN'));
+semaphore.append(el('text',{x:semaphoreX+44,y:semaphoreY+48,fill:'#d1e0f3','font-size':10},lineOff?'TOATE OPERAȚIILE':trafficRed?'LOCAL FULL':'CONVEYOR'));
+const lineToggle=el('g',{'data-line-toggle':'true',role:'button',tabindex:0,'aria-label':lineOff?'Pornește întreaga linie':'Oprește întreaga linie',style:'cursor:pointer'});
+lineToggle.append(el('rect',{x:semaphoreX+9,y:semaphoreY+65,width:114,height:19,rx:5,fill:lineOff?'#933c50':'#237553',stroke:'#cce8dd','stroke-width':1}));
+lineToggle.append(el('text',{x:semaphoreX+66,y:semaphoreY+79,'text-anchor':'middle',fill:'#fff','font-size':10,'font-weight':700},lineOff?'LINIE: OPRITĂ':'LINIE: PORNITĂ'));
+semaphore.append(lineToggle);light.append(semaphore);
+$('trafficStatus').textContent=lineOff?'LINIE OPRITĂ':trafficRed?'ROȘU · BUFFER LOCAL':'VERDE · RUN';$('trafficStatus').style.color=lineOff||trafficRed?'#ff5555':'#30d98b';$('waitingCount').textContent=cfg.stations.reduce((n,st)=>n+(st.beltWaitingCount||0),0);
 for(let s of cfg.stations){let p=point(s.pos),dx=p.x-480,dy=p.y-280,mag=Math.hypot(dx/1.6,dy)||1,sign=dy<0?-1:1;
-let bx=clamp(p.x-68,4,820),by=sign<0?12:465,color=s.type==='robot'?'#c89bff':'#eeb566';
-if(p.x<125||p.x>835){bx=p.x<480?12:812;by=clamp(p.y-36,80,450)}
+let bx=clamp(p.x-68,4,mapWidth-136),by=sign<0?12:465,color=s.type==='robot'?'#c89bff':'#eeb566';
+if(p.x<125||p.x>mapWidth-125){bx=p.x<mapCenterX?12:mapWidth-144;by=clamp(p.y-36,80,450)}
+if(Number.isFinite(s.panelX))bx=clamp(s.panelX,0,mapWidth-132);
+if(Number.isFinite(s.panelY))by=clamp(s.panelY,0,440);
 let endX=bx+68,endY=by+38;
 g.append(el('line',{x1:p.x,y1:p.y,x2:endX,y2:endY,stroke:color,'stroke-width':2,'stroke-dasharray':'5 4'}));
-if(s.type==='robot'){let tx=clamp(bx+130,155,780),ty=by<250?by+3:by-3;g.append(el('rect',{x:tx,y:ty,width:46,height:34,rx:7,fill:'#3d2d5b',stroke:'#b68cff','stroke-width':2}));g.append(el('text',{x:tx+23,y:ty+21,'text-anchor':'middle',fill:'#f2e6ff','font-size':12,'font-weight':700},'P'));g.append(el('line',{x1:bx+130,y1:by+20,x2:tx,y2:ty+17,stroke:'#a58ad5','stroke-dasharray':'3 3'}));}
+if(s.type==='robot'){let tx=clamp(bx+130,155,mapWidth-180),ty=by<250?by+3:by-3;g.append(el('rect',{x:tx,y:ty,width:46,height:34,rx:7,fill:'#3d2d5b',stroke:'#b68cff','stroke-width':2}));g.append(el('text',{x:tx+23,y:ty+21,'text-anchor':'middle',fill:'#f2e6ff','font-size':12,'font-weight':700},'P'));g.append(el('line',{x1:bx+130,y1:by+20,x2:tx,y2:ty+17,stroke:'#a58ad5','stroke-dasharray':'3 3'}));}
 let node=el('g',{'class':'station-node','data-id':s.id});
 // BEFORE FIFO and READY completed pieces (not an AFTER buffer); the station itself is not stopped by a full BEFORE buffer.
 const beforeN=s.beforeQueue.length,afterN=s.completed.length;
@@ -488,11 +549,15 @@ for(const [queue,yy] of [[s.beforeQueue,by+78],[s.completed,by+99]]){
   });
 }
 node.append(el('circle',{cx:p.x,cy:p.y,r:13,fill:color,stroke:'#e6f3ff','stroke-width':2}));
+node.append(el('rect',{x:bx,y:by,width:132,height:110,fill:'#fff','fill-opacity':0,'data-station-panel':s.id,'data-panel-x':bx,'data-panel-y':by,role:'button','aria-label':'Move station panel '+s.name,style:'cursor:grab'}));
+node.append(el('circle',{cx:p.x,cy:p.y,r:13,fill:color,stroke:'#e6f3ff','stroke-width':2}));
 node.append(el('text',{x:p.x,y:p.y+4,'text-anchor':'middle',fill:'#16243b','font-size':11,'font-weight':700},s.type==='robot'?'R':'S'));
 g.append(node);
 let parked=[...pieces.filter(x=>x.mode==='belt'&&x.blockedFor===s.id).map(x=>[x,'#ff5656']),...s.queue.map(x=>[x,'#ffc56f']),...s.pending.map(x=>[x,'#ffc56f']),...s.robotJobs.map(x=>[x.p,'#a78bfa']),...s.jobs.map(x=>[x.p,'#73e1a4']),...(s.completed||[]).map(x=>[x,'#ff91a4']),...s.returns.map(x=>[x,'#ff91a4']),/* BEFORE and READY shown as mini-slot buffers */];parked.slice(0,7).forEach(([piece,c],i)=>{let xx=bx+5+i*18,yy=by<280?by+82:by-18;g.append(el('rect',{x:xx,y:yy,width:16,height:13,rx:3,fill:c}));});}
+if(cfg.wpcEnabled){for(const wpc of wpcs){const position=point(world(wpc.pos)),carrier=el('g',{'data-wpc':wpc.id,'data-wpc-piece':wpc.pieceId||''});carrier.append(el('rect',{x:position.x-18,y:position.y-11,width:36,height:22,rx:4,fill:'#546a7d',stroke:'#e4edf5','stroke-width':1.5}));carrier.append(el('rect',{x:position.x-14,y:position.y-8,width:28,height:16,rx:3,fill:'#263a4b',stroke:'#8197aa','stroke-width':.8}));pg.append(carrier);}}
 for(let p of pieces.filter(x=>x.mode==='belt')){let xy=point(world(p.pos));let image=pieceImage(p);if(image){pg.append(el('image',{href:image.src,x:xy.x-13,y:xy.y-13,width:26,height:26,preserveAspectRatio:'xMidYMid meet'}));continue;}pg.append(el('rect',{x:xy.x-12,y:xy.y-10,width:24,height:20,rx:5,fill:'#5eb7ff',stroke:'#e6f5ff','stroke-width':1.5}));pg.append(el('text',{x:xy.x,y:xy.y+3,'text-anchor':'middle','font-size':9,'font-weight':700,fill:'#0c2440'},p.id.slice(-2)));}
-drawOverlays();drawPorts();let ep=point(cfg.exitPos),eg=el('g');let bx=clamp(ep.x-65,10,820),by=ep.y<280?clamp(ep.y+48,30,490):clamp(ep.y-100,30,490);eg.append(el('rect',{x:bx,y:by,width:130,height:48,rx:8,fill:'#145e4d',stroke:'#77e3bd','stroke-width':2}));eg.append(el('text',{x:bx+65,y:by+18,'text-anchor':'middle',fill:'white','font-size':12,'font-weight':700},'EXIT BUFFER '+MAX_EXIT_WAITING));eg.append(el('text',{x:bx+65,y:by+36,'text-anchor':'middle',fill:'#b9ffe6','font-size':12},(exitQueue.length+exitJobs.length)+' waiting / active'));$('overlaysSvg').append(eg);$('done').textContent=finished;$('beltCount').textContent=pieces.filter(x=>x.mode==='belt').length;$('offCount').textContent=pieces.filter(x=>x.mode==='off').length;$('eventCount').textContent=eventTotal;$('eventCount').title='Total evenimente; exportul pastreaza ultimele 5000.';$('nokCount').textContent=nokCount;$('exitBufferCount').textContent=exitQueue.length+exitJobs.length+exitBlocked.length;$('exitWaiting').textContent=exitQueue.length;$('exitActive').textContent=exitJobs.length;$('exitBlocked').textContent=exitBlocked.length;
+if(cfg.wpcEnabled){for(const wpc of wpcs){const position=point(world(wpc.pos)),label=el('g',{'data-wpc-label':wpc.id});label.append(el('rect',{x:position.x-23,y:position.y+15,width:46,height:13,rx:3,fill:'#17283a',stroke:'#d5e2ed','stroke-width':.8}));label.append(el('text',{x:position.x,y:position.y+24,'text-anchor':'middle',fill:'#f4f8fc','font-size':8,'font-weight':700},'WPC'+wpc.id.slice(-3)));pg.append(label);}}
+drawOverlays();drawPorts();let ep=point(cfg.exitPos),eg=el('g');let bx=clamp(ep.x-65,10,mapWidth-140),by=ep.y<280?clamp(ep.y+48,30,490):clamp(ep.y-100,30,490);eg.append(el('rect',{x:bx,y:by,width:130,height:48,rx:8,fill:'#145e4d',stroke:'#77e3bd','stroke-width':2}));eg.append(el('text',{x:bx+65,y:by+18,'text-anchor':'middle',fill:'white','font-size':12,'font-weight':700},'EXIT BUFFER '+MAX_EXIT_WAITING));eg.append(el('text',{x:bx+65,y:by+36,'text-anchor':'middle',fill:'#b9ffe6','font-size':12},(exitQueue.length+exitJobs.length)+' waiting / active'));$('overlaysSvg').append(eg);$('done').textContent=finished;$('beltCount').textContent=pieces.filter(x=>x.mode==='belt').length;$('offCount').textContent=pieces.filter(x=>x.mode==='off').length;$('eventCount').textContent=eventTotal;$('eventCount').title='Total evenimente; exportul pastreaza ultimele 5000.';$('nokCount').textContent=nokCount;$('exitBufferCount').textContent=exitQueue.length+exitJobs.length+exitBlocked.length;$('exitWaiting').textContent=exitQueue.length;$('exitActive').textContent=exitJobs.length;$('exitBlocked').textContent=exitBlocked.length;
 }
 function drawOverlays(){let g=$('overlaysSvg');g.replaceChildren();for(let n of cfg.noks){let p=point(n.pos),group=el('g',{'data-nok':n.id,style:'cursor:grab'});group.append(el('circle',{cx:p.x,cy:p.y,r:18,fill:'#a72f4a',stroke:'#fff','stroke-width':2}));group.append(el('text',{x:p.x,y:p.y+4,'text-anchor':'middle',fill:'white','font-size':11,'font-weight':700},'NOK'));group.append(el('text',{x:p.x,y:p.y+33,'text-anchor':'middle',fill:'#ffb6c5','font-size':12},n.name));g.append(group)}
 for(let im of cfg.images.filter(x=>x.kind==='overlay')){let station=get(im.station),p=station?point(station.pos):{x:im.x,y:im.y};let group=el('g',{'data-image':im.id,style:'cursor:grab'});group.append(el('image',{href:im.src,x:p.x-im.size/2,y:p.y-im.size/2,width:im.size,height:im.size,preserveAspectRatio:'xMidYMid meet'}));group.append(el('text',{x:p.x,y:p.y-im.size/2-5,'text-anchor':'middle',fill:'#f4f5ff','font-size':12,'font-weight':700,'paint-order':'stroke',stroke:'#122139','stroke-width':3},im.title));g.append(group)}}
@@ -513,7 +578,29 @@ card.append(preview,fields,remove);ir.append(card)
 $('applyRoute').onclick=()=>{syncPhysicalRoute();changeStructure()};
 $('addNok').onclick=()=>{let n={id:'NOK'+Date.now(),name:'NOK '+(cfg.noks.length+1),pos:.8};cfg.noks.push(n);renderAdvanced();draw()};
 $('addImage').onclick=()=>{let file=$('imageFile').files[0];if(!file||!file.type.startsWith('image/'))return alert('Selectează o imagine');if(file.size>1200000)return alert('Imagine prea mare. Folosește sub 1.2 MB');let reader=new FileReader();reader.onload=()=>{cfg.images.push({id:'IMG'+Date.now(),title:$('imageTitle').value||file.name,kind:$('imageKind').value,station:$('imageStation').value,size:clamp(+$('imageSize').value||70,20,180),x:480,y:280,src:reader.result});renderAdvanced();draw()};reader.readAsDataURL(file)};
-function drawPorts(){let g=$('portsSvg');g.replaceChildren();for(let item of [{id:'entry',pos:cfg.entryPos,label:'INTRARE',color:'#2563eb'},{id:'exit',pos:cfg.exitPos,label:'IEȘIRE',color:'#15805d'}]){let p=point(item.pos),y=p.y<280?p.y+45:p.y-38;let group=el('g',{'data-port':item.id,style:'cursor:grab'});group.append(el('line',{x1:p.x,y1:p.y,x2:p.x,y2:y,stroke:item.color,'stroke-width':3}));group.append(el('rect',{x:p.x-45,y:y-17,width:90,height:34,rx:8,fill:item.color,stroke:'#fff','stroke-width':1.5}));group.append(el('text',{x:p.x,y:y+4,'text-anchor':'middle',fill:'white','font-size':12,'font-weight':700},item.label));group.append(el('circle',{cx:p.x,cy:p.y,r:12,fill:item.color,stroke:'white','stroke-width':2}));g.append(group)}let dir=el('text',{x:480,y:320,'text-anchor':'middle',fill:'#8ecaff','font-size':19,'font-weight':700},cfg.direction===1?'↻ ORAR':'↺ ANTIORAR');g.append(dir);for(let i=0;i<5;i++){let at=mod(i/5+clock*cfg.speed/45*cfg.direction),pt=point(at),pt2=point(mod(at+cfg.direction*.002)),angle=Math.atan2(pt2.y-pt.y,pt2.x-pt.x)*180/Math.PI;g.append(el('path',{d:'M-8 -5 L2 0 L-8 5',transform:`translate(${pt.x} ${pt.y}) rotate(${angle})`,fill:'none',stroke:'#ffffff','stroke-width':3,'stroke-linecap':'round','stroke-linejoin':'round',opacity:'.8'}));}}
+function drawPorts(){
+  const group=$('portsSvg');group.replaceChildren();
+  for(const item of [{id:'entry',pos:cfg.entryPos,label:'INTRARE',color:'#2563eb'},{id:'exit',pos:cfg.exitPos,label:'IEȘIRE',color:'#15805d'}]){
+    const p=point(item.pos),saved=cfg.portLabelPositions?.[item.id];
+    const labelX=Number.isFinite(saved?.x)?saved.x:p.x;
+    const labelY=Number.isFinite(saved?.y)?saved.y:(p.y<280?p.y+45:p.y-38);
+    const marker=el('g',{'data-port':item.id,style:'cursor:grab'});
+    marker.append(el('circle',{cx:p.x,cy:p.y,r:12,fill:item.color,stroke:'white','stroke-width':2}));
+    group.append(marker);
+    const label=el('g',{'data-port-label':item.id,'data-label-x':labelX,'data-label-y':labelY,style:'cursor:grab'});
+    label.append(el('line',{x1:p.x,y1:p.y,x2:labelX,y2:labelY,stroke:item.color,'stroke-width':3}));
+    label.append(el('rect',{x:labelX-45,y:labelY-17,width:90,height:34,rx:8,fill:item.color,stroke:'#fff','stroke-width':1.5}));
+    label.append(el('text',{x:labelX,y:labelY+4,'text-anchor':'middle',fill:'white','font-size':12,'font-weight':700},cfg.portLabels?.[item.id]||item.label));
+    group.append(label);
+  }
+  const direction=el('text',{x:mapCenterX,y:320,'text-anchor':'middle',fill:'#8ecaff','font-size':19,'font-weight':700},cfg.direction===1?'↻ ORAR':'↺ ANTIORAR');
+  group.append(direction);
+  for(let i=0;i<5;i++){
+    const at=mod(i/5+clock*cfg.speed/45*cfg.direction),p=point(at),next=point(mod(at+cfg.direction*.002));
+    const angle=Math.atan2(next.y-p.y,next.x-p.x)*180/Math.PI;
+    group.append(el('path',{d:'M-8 -5 L2 0 L-8 5',transform:`translate(${p.x} ${p.y}) rotate(${angle})`,fill:'none',stroke:'#ffffff','stroke-width':3,'stroke-linecap':'round','stroke-linejoin':'round',opacity:'.8'}));
+  }
+}
 function syncPorts(){$('clockwise').style.background=cfg.direction===1?'#2967df':'#314763';$('counterclockwise').style.background=cfg.direction===-1?'#2967df':'#314763';$('entryPos').value=Math.round(cfg.entryPos*100);$('exitPos').value=Math.round(cfg.exitPos*100);$('direction').value=String(cfg.direction)}
 function changeStructure(){syncPhysicalRoute();updateGeometry();reset();renderEditor();renderSelect();renderAdvanced();}
 function field(grid,s,key,title,type='number',min=.1,max=600,step=.1,structural=false){let label=document.createElement('label');label.textContent=title;let input=document.createElement('input');input.type=type;input.value=key==='pos'?Math.round(s.pos*100):s[key];if(type==='number'){input.min=min;input.max=max;input.step=step;}input.onchange=()=>{let v=type==='number'?clamp(Number(input.value)||min,min,max):input.value.trim().slice(0,45);if(type==='number'&&step===1)v=Math.floor(v);s[key]=key==='pos'?v/100:v;if(structural||key==='pos'||key==='group')changeStructure();else{renderEditor();draw();}};label.append(input);grid.append(label);}
@@ -546,6 +633,433 @@ $('stage').addEventListener('pointermove',e=>{if(!drag)return;let c=coords(e),po
 $('stage').addEventListener('pointerup',e=>{if(!drag)return;drag=null;changeStructure()});
 $('stage').addEventListener('pointercancel',()=>{drag=null;changeStructure()});
 runtime();updateGeometry();syncPorts();$('interBuffer').value=cfg.interBuffer;$('exitDuration').value=cfg.exitDuration;$('exitCapacity').value=cfg.exitCapacity;$('speed').value=cfg.speed;$('speedLabel').textContent=cfg.speed.toFixed(1)+'×';$('feed').value=cfg.feed;$('spacing').value=cfg.spacing;renderEditor();renderSelect();renderAdvanced();draw();
+const normalizeWithSetupMaterial=normalize;
+normalize=function(raw){
+  const normalized=normalizeWithSetupMaterial(raw);
+  normalized.beltShape=['round','oval','straight'].includes(raw.beltShape)?raw.beltShape:'round';
+  normalized.lineEnabled=raw.lineEnabled!==false;
+  normalized.portLabels={entry:String(raw.portLabels?.entry||'INTRARE').slice(0,24),exit:String(raw.portLabels?.exit||'IEȘIRE').slice(0,24)};
+  normalized.portLabelPositions=raw.portLabelPositions&&typeof raw.portLabelPositions==='object'?{
+    entry:raw.portLabelPositions.entry&&{x:clamp(Number(raw.portLabelPositions.entry.x),45,5000),y:clamp(Number(raw.portLabelPositions.entry.y),20,535)},
+    exit:raw.portLabelPositions.exit&&{x:clamp(Number(raw.portLabelPositions.exit.x),45,5000),y:clamp(Number(raw.portLabelPositions.exit.y),20,535)}
+  }:{entry:null,exit:null};
+  normalized.semaphorePosition=raw.semaphorePosition&&typeof raw.semaphorePosition==='object'
+    ?{x:clamp(Number(raw.semaphorePosition.x),0,5000),y:clamp(Number(raw.semaphorePosition.y),0,480)}:{x:10,y:200};
+  if(normalized.beltShape==='straight'){normalized.entryPos=0;normalized.exitPos=.99;normalized.direction=1}
+  normalized.circleDiameter=clamp(Number(raw.circleDiameterM)*100||380,200,460);
+  if(raw.measurements){
+    normalized.beltLength=clamp(Number(raw.measurements.beltLengthM)*100,80,3000);
+    normalized.beltWidth=clamp(Number(raw.measurements.beltWidthCm),24,80);
+    normalized.spacing=clamp(Number(raw.measurements.spacingCm),15,100);
+  }
+  normalized.roundPorts=raw.roundPorts&&typeof raw.roundPorts==='object'
+    ?{entryPos:clamp(Number(raw.roundPorts.entryPos??0),0,.999),exitPos:clamp(Number(raw.roundPorts.exitPos??.9),0,.999),direction:Number(raw.roundPorts.direction)===-1?-1:1}
+    :{entryPos:0,exitPos:.9,direction:1};
+  normalized.stations.forEach((station,index)=>{
+    station.setupMaterial=raw.stations[index]?.setupMaterial===true;
+    station.materialRate=clamp(Math.floor(Number(raw.stations[index]?.materialRate)||30),1,600);
+    station.panelX=raw.stations[index]?.panelX==null?null:clamp(Number(raw.stations[index].panelX),0,5000);
+    station.panelY=raw.stations[index]?.panelY==null?null:clamp(Number(raw.stations[index].panelY),0,440);
+    station.feederX=raw.stations[index]?.feederX==null?null:clamp(Number(raw.stations[index].feederX),28,5000);
+    station.feederY=raw.stations[index]?.feederY==null?null:clamp(Number(raw.stations[index].feederY),18,552);
+  });
+  return normalized;
+};
+try{
+  const saved=JSON.parse(localStorage.getItem('sim_v26')||localStorage.getItem('sim_v19')||localStorage.getItem('sim_v18')||localStorage.getItem('sim_v13')||localStorage.getItem('sim_v03'));
+  cfg.beltShape=['round','oval','straight'].includes(saved.beltShape)?saved.beltShape:'round';
+  cfg.lineEnabled=saved.lineEnabled!==false;
+  cfg.portLabels=saved.portLabels||{entry:'INTRARE',exit:'IEȘIRE'};
+  cfg.portLabelPositions=saved.portLabelPositions||{entry:null,exit:null};
+  cfg.semaphorePosition=saved.semaphorePosition||{x:10,y:200};
+  if(cfg.beltShape==='straight'){cfg.entryPos=0;cfg.exitPos=.99;cfg.direction=1}
+  cfg.circleDiameter=clamp(Number(saved.circleDiameterM)*100||380,200,460);
+  cfg.roundPorts=saved.roundPorts||{entryPos:0,exitPos:.9,direction:1};
+  if(saved.measurements){
+    cfg.beltLength=clamp(Number(saved.measurements.beltLengthM)*100,80,3000);
+    cfg.beltWidth=clamp(Number(saved.measurements.beltWidthCm),24,80);
+    cfg.spacing=clamp(Number(saved.measurements.spacingCm),15,100);
+  }
+  for(const station of cfg.stations){
+    const savedStation=saved.stations.find(item=>item.id===station.id);
+    station.setupMaterial=savedStation?.setupMaterial===true;
+    station.materialRate=clamp(Math.floor(Number(savedStation?.materialRate)||30),1,600);
+    station.panelX=savedStation?.panelX==null?null:clamp(Number(savedStation.panelX),0,5000);
+    station.panelY=savedStation?.panelY==null?null:clamp(Number(savedStation.panelY),0,440);
+    station.feederX=savedStation?.feederX==null?null:clamp(Number(savedStation.feederX),28,5000);
+    station.feederY=savedStation?.feederY==null?null:clamp(Number(savedStation.feederY),18,552);
+  }
+}catch{
+  cfg.beltShape='round';
+  cfg.lineEnabled=true;
+  cfg.portLabels={entry:'INTRARE',exit:'IEȘIRE'};
+  cfg.portLabelPositions={entry:null,exit:null};
+  cfg.semaphorePosition={x:10,y:200};
+  cfg.circleDiameter=380;
+  cfg.roundPorts={entryPos:0,exitPos:.9,direction:1};
+  for(const station of cfg.stations){station.setupMaterial=false;station.materialRate=30}
+}
+const cleanWithSetupMaterial=clean;
+clean=function(){
+  const saved=cleanWithSetupMaterial();
+  saved.beltShape=cfg.beltShape;
+  saved.lineEnabled=cfg.lineEnabled!==false;
+  saved.portLabels=cfg.portLabels;
+  saved.portLabelPositions=cfg.portLabelPositions;
+  saved.semaphorePosition=cfg.semaphorePosition;
+  saved.circleDiameterM=cfg.circleDiameter/100;
+  saved.roundPorts=cfg.beltShape==='round'?{entryPos:cfg.entryPos,exitPos:cfg.exitPos,direction:cfg.direction}:cfg.roundPorts;
+  saved.measurements={beltLengthM:cfg.beltLength/100,beltWidthCm:cfg.beltWidth,spacingCm:cfg.spacing};
+  delete saved.beltLength;delete saved.beltWidth;delete saved.spacing;
+  saved.stations.forEach((station,index)=>{
+    station.setupMaterial=cfg.stations[index].setupMaterial===true;
+    station.materialRate=cfg.stations[index].materialRate||30;
+    station.panelX=cfg.stations[index].panelX??null;
+    station.panelY=cfg.stations[index].panelY??null;
+    station.feederX=cfg.stations[index].feederX??null;
+    station.feederY=cfg.stations[index].feederY??null;
+    step=function(dt){if(cfg.lineEnabled===false)return;stepWithMaterialFeeds(dt);advanceMaterialFeeders()};
+    station.feederX=cfg.stations[index].feederX??null;
+    station.feederY=cfg.stations[index].feederY??null;
+  step=function(dt){if(cfg.lineEnabled===false)return;stepWithMaterialFeeds(dt);advanceMaterialFeeders()};
+  });
+  return saved;
+};
+const renderEditorWithSetupMaterial=renderEditor;
+renderEditor=function(){
+  renderEditorWithSetupMaterial();
+  for(const [index,station] of ordered().entries()){
+    const card=$('editor').children[index];
+    const label=document.createElement('label');
+    label.style.cssText='display:flex;align-items:center;gap:8px;margin:8px 0;cursor:pointer';
+    const input=document.createElement('input');
+    input.type='checkbox';
+    input.checked=station.setupMaterial===true;
+    input.style.cssText='width:18px;height:18px;margin:0;accent-color:#2967df';
+    input.setAttribute('aria-label','setupMaterial');
+    const status=document.createElement('span');
+    status.textContent='setupMaterial: '+(input.checked?'ON':'OFF');
+    const rateLabel=document.createElement('label');
+    rateLabel.textContent='Rată feeder (piese/min)';
+    rateLabel.style.display=input.checked?'grid':'none';
+    const rateInput=document.createElement('input');
+    rateInput.type='number';rateInput.min='1';rateInput.max='600';rateInput.step='1';
+    rateInput.value=station.materialRate||30;
+    rateInput.setAttribute('aria-label','Rată feeder piese pe minut');
+    rateInput.onchange=()=>{station.materialRate=clamp(Math.floor(Number(rateInput.value)||30),1,600);rateInput.value=station.materialRate};
+    rateLabel.append(rateInput);
+    input.onchange=()=>{
+      station.setupMaterial=input.checked;
+      status.textContent='setupMaterial: '+(input.checked?'ON':'OFF');
+      rateLabel.style.display=input.checked?'grid':'none';
+      draw();
+    };
+    label.append(input,status);
+    card.append(label,rateLabel);
+  }
+};
+renderEditor();
+let materialFeeds=[];
+let materialRequests=[];
+const materialNextFeedAt=new Map();
+let materialSequence=0;
+const resetWithMaterialFeeds=reset;
+reset=function(){materialFeeds=[];materialRequests=[];materialNextFeedAt.clear();resetWithMaterialFeeds()};
+$('reset').onclick=reset;
+const takeWithMaterial=take;
+take=function(piece,station){
+  takeWithMaterial(piece,station);
+  if(station.setupMaterial!==true)return;
+  piece.materialRequired=true;piece.materialReady=false;
+  materialRequests.push({stationId:station.id,piece});
+};
+function advanceMaterialFeeders(){
+  for(let index=materialFeeds.length-1;index>=0;index--){
+    const feed=materialFeeds[index];
+    if(clock<feed.finishesAt)continue;
+    feed.piece.materialReady=true;
+    emit('material_attached',feed.piece,get(feed.stationId),{material_piece_id:feed.materialPieceIds[0]});
+    materialFeeds.splice(index,1);
+  }
+  for(const station of cfg.stations){
+    const requestIndex=materialRequests.findIndex(request=>request.stationId===station.id);
+    if(requestIndex<0||clock<(materialNextFeedAt.get(station.id)||0))continue;
+    const [request]=materialRequests.splice(requestIndex,1);
+    const materialPieceId='MAT'+String(++materialSequence).padStart(4,'0');
+    const rate=clamp(Number(station.materialRate)||30,1,600);
+    materialFeeds.push({stationId:station.id,pieceId:request.piece.id,piece:request.piece,materialPieceIds:[materialPieceId],startedAt:clock,finishesAt:clock+.75});
+    materialNextFeedAt.set(station.id,clock+60/rate);
+    emit('material_fed',request.piece,station,{quantity:1,material_piece_id:materialPieceId,rate_per_min:rate});
+  }
+}
+const stepWithMaterialFeeds=step;
+step=function(dt){if(cfg.lineEnabled===false)return;stepWithMaterialFeeds(dt);advanceMaterialFeeders()};
+const drawWithMaterialFeeders=draw;
+draw=function(){
+  drawWithMaterialFeeders();
+  const group=$('stationsSvg');
+  materialFeeds=materialFeeds.filter(feed=>clock-feed.startedAt<1.4);
+  for(const station of cfg.stations){
+    if(station.setupMaterial!==true)continue;
+    const p=point(station.pos);
+    const feederX=clamp(Number.isFinite(station.feederX)?station.feederX:p.x+84,28,mapWidth-28);
+    const feederY=clamp(Number.isFinite(station.feederY)?station.feederY:p.y+(p.y<280?-22:22),18,552);
+    const feeder=el('g',{'data-material-feeder':station.id,'data-feeder-x':feederX,'data-feeder-y':feederY,role:'img','aria-label':'Material feeder for '+station.name,style:'cursor:grab'});
+    feeder.append(el('title',{},'Feeder material - '+station.name));
+    feeder.append(el('line',{x1:feederX,y1:feederY,x2:p.x,y2:p.y,stroke:'#0d281e','stroke-width':11,'stroke-linecap':'round'}));
+    feeder.append(el('line',{x1:feederX,y1:feederY,x2:p.x,y2:p.y,stroke:'#4d9f70','stroke-width':8,'stroke-linecap':'round'}));
+    for(const position of [.25,.5,.75]){
+      feeder.append(el('circle',{cx:feederX+(p.x-feederX)*position,cy:feederY+(p.y-feederY)*position,r:3,fill:'#13271d',stroke:'#a3e4b7','stroke-width':.8}));
+    }
+    feeder.append(el('rect',{x:feederX-16,y:feederY-13,width:32,height:26,rx:5,fill:'#174b3c',stroke:'#8be6b4','stroke-width':1.5}));
+    feeder.append(el('rect',{x:feederX-10,y:feederY-8,width:5,height:5,rx:1,fill:'#b8f2cf'}));
+    feeder.append(el('rect',{x:feederX-2,y:feederY-8,width:5,height:5,rx:1,fill:'#b8f2cf'}));
+    feeder.append(el('rect',{x:feederX+6,y:feederY-8,width:5,height:5,rx:1,fill:'#b8f2cf'}));
+    feeder.append(el('text',{x:feederX,y:feederY+10,'text-anchor':'middle',fill:'#e9fff1','font-size':7,'font-weight':700},'FEED'));
+    group.append(feeder);
+    for(const feed of materialFeeds.filter(item=>item.stationId===station.id)){
+      for(let index=0;index<feed.materialPieceIds.length;index++){
+        const progress=clamp((clock-feed.startedAt-index*.12)/.72,0,1);
+        if(progress>=1)continue;
+        const x=feederX+(p.x-feederX)*progress,y=feederY+(p.y-feederY)*progress;
+        group.append(el('rect',{x:x-3.5,y:y-3,width:7,height:6,rx:1.5,fill:'#b8f2cf',stroke:'#267c54','stroke-width':.8}));
+      }
+    }
+  }
+};
+const beltSection=$('beltLength').closest('section');
+const beltFields=$('beltLength').closest('.fields');
+const shapeFields=document.createElement('div');shapeFields.className='fields';
+const shapeLabel=document.createElement('label');shapeLabel.textContent='Formă bandă';
+const shapeSelect=document.createElement('select');shapeSelect.id='beltShape';
+for(const [value,text] of [['round','Rotundă · circuit închis'],['oval','Ovală · circuit închis'],['straight','Dreaptă · IN → OUT, retur gol']]){
+  const option=document.createElement('option');option.value=value;option.textContent=text;shapeSelect.append(option);
+}
+shapeLabel.append(shapeSelect);shapeFields.append(shapeLabel);
+beltSection.insertBefore(shapeFields,beltFields);
+const circleLabel=document.createElement('label');circleLabel.textContent='Diametru bandă (m)';
+const circleInput=document.createElement('input');circleInput.id='beltCircleDiameter';circleInput.type='number';circleInput.min='2';circleInput.max='4.6';circleInput.step='.1';
+circleLabel.append(circleInput);beltFields.append(circleLabel);
+function syncBeltModeControls(){
+  const straight=cfg.beltShape==='straight',oval=cfg.beltShape==='oval';
+  shapeSelect.value=cfg.beltShape;
+  $('beltLength').max='3000';
+  $('beltLength').closest('label').style.display=straight||oval?'grid':'none';
+  circleLabel.style.display=straight?'none':'grid';
+  $('beltLength').closest('label').firstChild.nodeValue=straight?'Lungime segment activ (m) ':'Lungime porțiune dreaptă (m) ';
+  $('beltWidth').closest('label').firstChild.nodeValue='Lățime bandă (cm)';
+  $('spacing').closest('label').firstChild.nodeValue='Distanță minimă între piese (cm)';
+  $('lengthLabel').textContent=straight||oval?(cfg.beltLength/100).toFixed(2)+' m':(cfg.circleDiameter/100).toFixed(2)+' m';
+  $('beltLength').value=cfg.beltLength;$('beltWidth').value=cfg.beltWidth;$('spacing').value=cfg.spacing;
+  circleInput.value=(cfg.circleDiameter/100).toFixed(1);
+  $('entryPos').disabled=straight;$('exitPos').disabled=straight;$('direction').disabled=straight;
+  $('clockwise').disabled=straight;$('counterclockwise').disabled=straight;
+  $('stage').setAttribute('aria-label',straight?'Bandă dreaptă cu retur îngust și gol':oval?'Bandă ovală interactivă':'Bandă circulară interactivă');
+  const directionLabel=$('beltDirection');
+  if(directionLabel){directionLabel.setAttribute('x',mapCenterX);directionLabel.setAttribute('y',straight?'245':'290');directionLabel.textContent=straight?'→ flux IN spre OUT · retur îngust și gol':oval?'↻ flux pe buclă ovală':'↻ sens orar · piese în mișcare';}
+  const titleLabel=$('beltTitle');if(titleLabel){titleLabel.setAttribute('x',mapCenterX);titleLabel.setAttribute('y',straight?'218':'261');}
+  const help=beltSection.querySelector('p');
+  help.textContent=straight
+    ?'Segmentul activ dintre IN și OUT este centrat pe hartă. Returul de dedesubt este îngustat și nu transportă piese. Dimensiunile sunt exprimate în m și cm.'
+    :oval?'Buclă ovală închisă. Lungimea segmentului drept și diametrul se configurează în m.':'Circuit circular închis. Dimensiunile sunt exprimate în m și cm.';
+}
+const updateGeometryBase=updateGeometry;
+updateGeometry=function(){
+  updateGeometryBase();
+  mapWidth=Math.max(960,cfg.beltLength+(cfg.beltShape==='oval'?cfg.circleDiameter:400)+40);
+  mapCenterX=mapWidth/2;
+  $('stage').setAttribute('viewBox',`0 0 ${mapWidth} 570`);
+  const visible=$('returnSvg');visible.replaceChildren();
+  let path;
+  if(cfg.beltShape==='straight'||cfg.beltShape==='oval'){
+    const half=cfg.beltLength/2,left=mapCenterX-half,right=mapCenterX+half;
+    const r=cfg.beltShape==='straight'?120:cfg.circleDiameter/2;
+    const top=cfg.beltShape==='straight'?285:280-r,bottom=cfg.beltShape==='straight'?525:280+r;
+    path=`M${left} ${top} H${right} A${r} ${r} 0 0 1 ${right} ${bottom} H${left} A${r} ${r} 0 0 1 ${left} ${top} Z`;
+    if(cfg.beltShape==='straight'){
+      const upper=`M${left} ${top} H${right} A${r} ${r} 0 0 1 ${right} ${bottom}`;
+      const leftTurn=`M${left} ${bottom} A${r} ${r} 0 0 1 ${left} ${top}`;
+      visible.append(el('path',{d:upper,fill:'none',stroke:'#40536d','stroke-width':cfg.beltWidth,'stroke-linecap':'round'}));
+      visible.append(el('path',{d:leftTurn,fill:'none',stroke:'#40536d','stroke-width':cfg.beltWidth,'stroke-linecap':'round'}));
+      visible.append(el('path',{d:`M${right} ${bottom} H${left}`,fill:'none',stroke:'#40536d','stroke-width':Math.max(12,cfg.beltWidth*.42),'stroke-linecap':'round'}));
+      visible.append(el('path',{d:upper,fill:'none',stroke:'#b4c3d6','stroke-width':2,'stroke-dasharray':'12 14','stroke-linecap':'round',opacity:'.55'}));
+      visible.append(el('path',{d:leftTurn,fill:'none',stroke:'#b4c3d6','stroke-width':2,'stroke-dasharray':'12 14','stroke-linecap':'round',opacity:'.55'}));
+      visible.append(el('path',{d:`M${right} ${bottom} H${left}`,fill:'none',stroke:'#b4c3d6','stroke-width':1.2,'stroke-dasharray':'8 10','stroke-linecap':'round',opacity:'.45'}));
+    }else{
+      visible.append(el('path',{d:path,fill:'none',stroke:'#40536d','stroke-width':cfg.beltWidth}));
+      visible.append(el('path',{d:path,fill:'none',stroke:'#b4c3d6','stroke-width':2,'stroke-dasharray':'12 14',opacity:'.55'}));
+    }
+  }else{
+    const radius=cfg.circleDiameter/2,top=280-radius,bottom=280+radius;
+    path=`M${mapCenterX} ${top} A${radius} ${radius} 0 0 1 ${mapCenterX} ${bottom} A${radius} ${radius} 0 0 1 ${mapCenterX} ${top} Z`;
+    visible.append(el('path',{d:path,fill:'none',stroke:'#40536d','stroke-width':cfg.beltWidth}));
+    visible.append(el('path',{d:path,fill:'none',stroke:'#b4c3d6','stroke-width':2,'stroke-dasharray':'12 14',opacity:'.55'}));
+  }
+  track.setAttribute('d',path);$('trackDashes').setAttribute('d',path);
+  track.setAttribute('stroke','none');$('trackDashes').setAttribute('stroke','none');
+  track.setAttribute('stroke-width',cfg.beltWidth);L=track.getTotalLength();
+  syncBeltModeControls();
+};
+const pointBase=point;
+const drawPortsBase=drawPorts;
+drawPorts=function(){
+  drawPortsBase();
+  if(cfg.beltShape==='straight'){
+    const direction=$('portsSvg').querySelectorAll('text').item(2);
+    if(direction)direction.textContent='→ IN → OUT';
+  }
+  const direction=$('portsSvg').querySelectorAll('text').item(2);if(direction)direction.setAttribute('x',mapCenterX);
+};
+point=function(pos){return pointBase(cfg.beltShape==='straight'?pos*Math.min(cfg.beltLength/L,1):pos)};
+const syncPortsBase=syncPorts;
+syncPorts=function(){syncPortsBase();syncBeltModeControls()};
+shapeSelect.onchange=()=>{
+  if(cfg.beltShape!=='straight')cfg.roundPorts={entryPos:cfg.entryPos,exitPos:cfg.exitPos,direction:cfg.direction};
+  cfg.beltShape=shapeSelect.value;
+  if(cfg.beltShape==='straight'){cfg.entryPos=0;cfg.exitPos=.99;cfg.direction=1}
+  else Object.assign(cfg,cfg.roundPorts||{entryPos:0,exitPos:.9,direction:1});
+  changeStructure();syncPorts();
+};
+circleInput.onchange=()=>{cfg.circleDiameter=clamp((Number(circleInput.value)||3.8)*100,200,460);changeStructure()};
+const materialUnitNote=document.createElement('small');
+materialUnitNote.textContent='Scară de măsurare: 100 cm = 1 m.';
+beltSection.append(materialUnitNote);
+const focusStyle=document.createElement('style');
+focusStyle.textContent='.layout.station-focus{max-width:none;grid-template-columns:minmax(0,1fr)}.layout.station-focus>.stack:first-child>section:not(:first-child),.layout.station-focus>.stack:nth-child(2){display:none!important}.layout.station-focus #stage{max-height:calc(100vh - 145px)}';
+document.head.append(focusStyle);
+const stationLayout=$('editor').closest('.layout');
+const focusButton=document.createElement('button');focusButton.type='button';focusButton.className='alt';focusButton.id='stationFocus';focusButton.textContent='⛶ Focus bandă';
+$('toggle').insertAdjacentElement('afterend',focusButton);
+focusButton.onclick=()=>{
+  const focused=stationLayout.classList.toggle('station-focus');
+  focusButton.textContent=focused?'⤢ Arată setările':'⛶ Focus bandă';
+  focusButton.setAttribute('aria-pressed',String(focused));
+};
+const portLabelFields=document.createElement('div');portLabelFields.className='fields';
+for(const item of [{id:'entry',label:'Text INTRARE'},{id:'exit',label:'Text IEȘIRE'}]){
+  const field=document.createElement('label');field.textContent=item.label;
+  const input=document.createElement('input');input.type='text';input.maxLength=24;input.value=cfg.portLabels[item.id];input.setAttribute('aria-label',item.label);
+  input.onchange=()=>{cfg.portLabels[item.id]=input.value.trim().slice(0,24)||item.label.replace('Text ','');input.value=cfg.portLabels[item.id];drawPorts()};
+  field.append(input);portLabelFields.append(field);
+}
+$('entryPos').closest('.fields').insertAdjacentElement('afterend',portLabelFields);
+function toggleWholeLine(){
+  cfg.lineEnabled=cfg.lineEnabled===false;
+  emit(cfg.lineEnabled?'operation_started':'operation_stopped',null,null,{operation:'line'});
+  draw();
+}
+$('stage').addEventListener('keydown',event=>{
+  if(!event.target.closest('[data-line-toggle]')||!['Enter',' '].includes(event.key))return;
+  toggleWholeLine();event.preventDefault();event.stopPropagation();
+});
+$('stage').addEventListener('pointerdown',event=>{
+  if(event.target.closest('[data-line-toggle]')){
+    toggleWholeLine();event.preventDefault();event.stopImmediatePropagation();return;
+  }
+  const portLabel=event.target.closest('[data-port-label]');
+  const semaphore=event.target.closest('[data-semaphore-panel]');
+  const feeder=event.target.closest('[data-material-feeder]');
+  if(portLabel||semaphore||feeder){
+    const start=coords(event);
+    if(portLabel){
+      const id=portLabel.dataset.portLabel;
+      drag={mapItem:'portLabel',id,start,origin:{x:Number(portLabel.dataset.labelX),y:Number(portLabel.dataset.labelY)}};
+    }else if(semaphore)drag={mapItem:'semaphore',start,origin:{...cfg.semaphorePosition}};
+    else drag={mapItem:'feeder',id:feeder.dataset.materialFeeder,start,origin:{x:Number(feeder.dataset.feederX),y:Number(feeder.dataset.feederY)}};
+    $('stage').setPointerCapture(event.pointerId);event.preventDefault();event.stopImmediatePropagation();return;
+  }
+  if(cfg.beltShape==='straight'&&event.target.closest('[data-port]'))event.stopImmediatePropagation();
+},true);
+$('stage').addEventListener('pointermove',event=>{
+  if(!drag?.mapItem)return;
+  const position=coords(event),x=drag.origin.x+position.x-drag.start.x,y=drag.origin.y+position.y-drag.start.y;
+  if(drag.mapItem==='portLabel')cfg.portLabelPositions[drag.id]={x:clamp(x,45,mapWidth-45),y:clamp(y,20,535)};
+  else if(drag.mapItem==='semaphore')cfg.semaphorePosition={x:clamp(x,0,mapWidth-132),y:clamp(y,0,480)};
+  else{const station=get(drag.id);if(station){station.feederX=clamp(x,28,mapWidth-28);station.feederY=clamp(y,18,552)}}
+  draw();event.stopImmediatePropagation();
+},true);
+$('stage').addEventListener('pointerup',event=>{
+  if(!drag?.mapItem)return;
+  drag=null;draw();event.stopImmediatePropagation();
+},true);
+$('stage').addEventListener('pointercancel',event=>{
+  if(!drag?.mapItem)return;
+  drag=null;draw();event.stopImmediatePropagation();
+},true);
+$('stage').addEventListener('pointerdown',event=>{
+  const panel=event.target.closest('[data-station-panel]');
+  if(!panel)return;
+  const id=panel.dataset.stationPanel,station=get(id);
+  if(!station)return;
+  selected=id;
+  drag={panel:id,start:coords(event),origin:{x:Number(panel.dataset.panelX),y:Number(panel.dataset.panelY)}};
+  $('stage').setPointerCapture(event.pointerId);
+  renderEditor();
+  event.preventDefault();event.stopImmediatePropagation();
+},true);
+$('stage').addEventListener('pointermove',event=>{
+  if(!drag?.panel)return;
+  const station=get(drag.panel),position=coords(event);
+  if(station){
+    station.panelX=clamp(drag.origin.x+position.x-drag.start.x,0,mapWidth-132);
+    station.panelY=clamp(drag.origin.y+position.y-drag.start.y,0,440);
+    draw();
+  }
+  event.stopImmediatePropagation();
+},true);
+$('stage').addEventListener('pointerup',event=>{
+  if(!drag?.panel)return;
+  drag=null;draw();event.stopImmediatePropagation();
+},true);
+$('stage').addEventListener('pointercancel',event=>{
+  if(!drag?.panel)return;
+  drag=null;draw();event.stopImmediatePropagation();
+},true);
+updateGeometry();syncPorts();renderEditor();draw();
+const normalizeWithWpcs=normalize;
+normalize=function(raw){const normalized=normalizeWithWpcs(raw);normalized.wpcEnabled=raw.wpcEnabled!==false;normalized.wpcCount=clamp(Math.floor(Number(raw.wpcCount)||8),1,50);return normalized};
+const storedWpcConfig=(()=>{try{return JSON.parse(localStorage.getItem('sim_v26')||localStorage.getItem('sim_v19')||localStorage.getItem('sim_v18')||localStorage.getItem('sim_v13')||localStorage.getItem('sim_v03')||'{}')||{}}catch{return {}}})();
+cfg.wpcEnabled=storedWpcConfig.wpcEnabled!==false;
+cfg.wpcCount=clamp(Math.floor(Number(storedWpcConfig.wpcCount)||8),1,50);
+const cleanWithWpcs=clean;
+clean=function(){return {...cleanWithWpcs(),wpcEnabled:cfg.wpcEnabled,wpcCount:cfg.wpcCount}};
+function addWpcInLargestGap(){
+  let bestPosition=.5,bestDistance=-1;
+  for(let index=0;index<200;index++){
+    const position=index/200;
+    const distance=wpcs.length?Math.min(...wpcs.map(wpc=>Math.min(mod(position-wpc.pos),mod(wpc.pos-position)))):1;
+    if(distance>bestDistance){bestPosition=position;bestDistance=distance;}
+  }
+  wpcs.push({id:'WPC'+String(++wpcSequence).padStart(3,'0'),pos:bestPosition,pieceId:null});
+}
+function resizeWpcs(value){
+  const loaded=pieces.filter(piece=>piece.wpcId).length;
+  const requested=clamp(Math.floor(Number(value)||1),1,50);
+  cfg.wpcCount=Math.max(requested,loaded);
+  if(cfg.wpcEnabled){
+    while(wpcs.length>cfg.wpcCount){const index=wpcs.findIndex(wpc=>!wpc.pieceId);if(index<0)break;wpcs.splice(index,1);}
+    while(wpcs.length<cfg.wpcCount)addWpcInLargestGap();
+  }
+  wpcCountInput.value=cfg.wpcCount;draw();
+}
+const wpcControls=document.createElement('div');wpcControls.id='wpcControls';wpcControls.className='fields';wpcControls.style.marginTop='10px';
+const wpcToggleLabel=document.createElement('label');wpcToggleLabel.style.cssText='display:flex;align-items:center;gap:8px';
+const wpcToggle=document.createElement('input');wpcToggle.id='wpcEnabled';wpcToggle.type='checkbox';wpcToggle.checked=cfg.wpcEnabled;wpcToggle.setAttribute('aria-label','Sistem Workpiece Carrier (WPC)');
+const wpcToggleStatus=document.createElement('span');wpcToggleStatus.textContent='Sistem WPC: '+(cfg.wpcEnabled?'PORNIT':'OPRIT');
+wpcToggleLabel.append(wpcToggle,wpcToggleStatus);
+const wpcCountLabel=document.createElement('label');wpcCountLabel.textContent='Număr WPC';
+const wpcCountInput=document.createElement('input');wpcCountInput.id='wpcCount';wpcCountInput.type='number';wpcCountInput.min='1';wpcCountInput.max='50';wpcCountInput.step='1';wpcCountInput.value=cfg.wpcCount;wpcCountInput.disabled=!cfg.wpcEnabled;wpcCountLabel.append(wpcCountInput);
+const wpcCountActions=document.createElement('div');wpcCountActions.className='actions';
+const wpcDecrease=document.createElement('button');wpcDecrease.type='button';wpcDecrease.className='alt';wpcDecrease.textContent='−';wpcDecrease.title='Scade numărul WPC';wpcDecrease.setAttribute('aria-label','Scade numărul WPC');wpcDecrease.disabled=!cfg.wpcEnabled;
+const wpcIncrease=document.createElement('button');wpcIncrease.type='button';wpcIncrease.className='alt';wpcIncrease.textContent='+';wpcIncrease.title='Crește numărul WPC';wpcIncrease.setAttribute('aria-label','Crește numărul WPC');wpcIncrease.disabled=!cfg.wpcEnabled;
+wpcCountActions.append(wpcDecrease,wpcIncrease);wpcControls.append(wpcToggleLabel,wpcCountLabel,wpcCountActions);beltSection.append(wpcControls);
+wpcToggle.onchange=()=>{cfg.wpcEnabled=wpcToggle.checked;wpcToggleStatus.textContent='Sistem WPC: '+(cfg.wpcEnabled?'PORNIT':'OPRIT');wpcCountInput.disabled=!cfg.wpcEnabled;wpcDecrease.disabled=!cfg.wpcEnabled;wpcIncrease.disabled=!cfg.wpcEnabled;reset();};
+wpcCountInput.onchange=()=>resizeWpcs(wpcCountInput.value);
+wpcDecrease.onclick=()=>resizeWpcs(Number(wpcCountInput.value)-1);
+wpcIncrease.onclick=()=>resizeWpcs(Number(wpcCountInput.value)+1);
+resetWpcs();draw();
+const previousImportHandler=$('importFile').onchange;
+$('importFile').onchange=async event=>{await previousImportHandler.call($('importFile'),event);wpcToggle.checked=cfg.wpcEnabled;wpcToggleStatus.textContent='Sistem WPC: '+(cfg.wpcEnabled?'PORNIT':'OPRIT');wpcCountInput.value=cfg.wpcCount;wpcCountInput.disabled=!cfg.wpcEnabled;wpcDecrease.disabled=!cfg.wpcEnabled;wpcIncrease.disabled=!cfg.wpcEnabled;};
 function advanceTime(now){
   if(running)accumulator+=Math.max(0,(now-last)/1000);
   last=now;
@@ -573,6 +1087,38 @@ translations['Buffer ieșire: maximum 1.000 de piese în așteptare. Piesele sup
 Object.assign(translations,{'PORNIT':'RUNNING','OPRIT':'STOPPED','PROCES':'PROCESS'});
 Object.assign(translations,{'Permite evacuarea pieselor incomplete':'Allow unloading incomplete parts','Incomplete evacuate':'Incomplete unloaded'});
 Object.assign(translations,{'Secvența include intrarea, procesele și ieșirea în ordinea fizică pe bandă. Stațiile cu același grup rămân alternative. Grupul poate avea maximum 8 stații.':'The sequence includes input, processes and output in physical conveyor order. Stations sharing a group remain alternatives. A group can contain up to 8 stations.','Evacuare incompletă permisă. Stații după IEȘIRE: ':'Incomplete unloading allowed. Stations after OUTPUT: ','. Mută IEȘIRE după ultima stație sau permite evacuarea incompletelor.':'. Move OUTPUT after the last station or allow incomplete unloading.'});
+Object.assign(translations,{
+  'Formă bandă':'Belt layout',
+  'Rotundă · circuit închis':'Round · closed loop',
+  'Ovală · circuit închis':'Oval · closed loop',
+  'Dreaptă · IN → OUT, retur gol':'Straight · IN → OUT, empty return',
+  'Lungime porțiune dreaptă (m)':'Straight section length (m)',
+  'Bandă dreaptă cu retur îngust și gol':'Straight belt with narrow empty return',
+  'Buclă ovală închisă. Lungimea segmentului drept și diametrul se configurează în m.':'Closed oval loop. Set the straight section length and diameter in meters.',
+  '→ flux IN spre OUT · retur îngust și gol':'→ flow IN to OUT · narrow empty return',
+  'Lungime segment activ (m)':'Active run length (m)',
+  'Lățime bandă (cm)':'Belt width (cm)',
+  'Distanță minimă între piese (cm)':'Minimum part spacing (cm)',
+  'Diametru bandă (m)':'Belt diameter (m)',
+  'Circuit circular închis. Dimensiuni: 1 m = 100 px, 1 cm = 1 px.':'Closed circular loop. Scale: 1 m = 100 px, 1 cm = 1 px.',
+  'Circuit circular închis. Dimensiunile sunt exprimate în m și cm.':'Closed circular loop. Dimensions are shown in m and cm.',
+  'IN și OUT sunt la capetele segmentului activ. Returul de dedesubt rămâne gol. Dimensiunile sunt exprimate în m și cm.':'IN and OUT are at the ends of the active run. The return belt underneath stays empty. Dimensions are shown in m and cm.',
+  'Scară de măsurare: 100 cm = 1 m.':'Measurement scale: 100 cm = 1 m.',
+  '→ flux IN spre OUT · retur gol':'→ flow IN to OUT · empty return',
+  'Rată feeder (piese/min)':'Feeder rate (parts/min)',
+  'Rată feeder piese pe minut':'Feeder rate in parts per minute',
+  '⛶ Focus bandă':'⛶ Focus belt',
+  'Text INTRARE':'INPUT label',
+  'Text IEȘIRE':'OUTPUT label',
+  'LINIE: PORNITĂ':'LINE: ON',
+  'LINIE: OPRITĂ':'LINE: OFF',
+  'LINIE OPRITĂ':'LINE STOPPED',
+  'TOATE OPERAȚIILE':'ALL OPERATIONS',
+  'Oprește întreaga linie':'Stop entire line',
+  'Pornește întreaga linie':'Start entire line',
+  '⤢ Arată setările':'⤢ Show settings'
+});
+Object.assign(translations,{'Sistem Workpiece Carrier (WPC)':'Workpiece Carrier system (WPC)','Sistem WPC: PORNIT':'WPC system: ON','Sistem WPC: OPRIT':'WPC system: OFF','Număr WPC':'WPC count','Scade numărul WPC':'Decrease WPC count','Crește numărul WPC':'Increase WPC count'});
 const entries=Object.entries(translations).sort((a,b)=>b[0].length-a[0].length);
 let lang='ro',theme='black';
 try{lang=localStorage.getItem('sim_ui_lang')==='en'?'en':'ro';theme=['black','white','grey'].includes(localStorage.getItem('sim_ui_theme'))?localStorage.getItem('sim_ui_theme'):'black'}catch{}
